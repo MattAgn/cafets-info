@@ -16,7 +16,7 @@
         android:text="@string/get_cafeterias"
         android:textSize="12sp"
         tools:ignore="ButtonStyle"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="14dp"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="419dp" />
 
