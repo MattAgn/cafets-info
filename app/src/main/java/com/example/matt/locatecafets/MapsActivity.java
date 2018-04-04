@@ -1,12 +1,18 @@
 package com.example.matt.locatecafets;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,6 +21,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -43,27 +52,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
 
-        Cafeteria cafet = getIntent().getExtras().getParcelable("cafet");
-        mMap.addMarker(new MarkerOptions().position(cafet.getCoordinates()).title("Marker in " + cafet.getName()));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(cafet.getCoordinates()));
+        ArrayList<Cafeteria> cafetArrList = getIntent().getParcelableArrayListExtra("cafets");
+        for (Cafeteria cafet : cafetArrList) {
+            mMap.addMarker(new MarkerOptions().position(cafet.getCoordinates()).title("Marker in " + cafet.getName()));
+        }
 
-        if (ContextCompat.checkSelfPermission (this.getApplicationContext (), android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
             mMap.setMyLocationEnabled(true);
         }
         //creates the buttons for zoom and compass
-        mMap.getUiSettings().setZoomGesturesEnabled (true) ;
-        mMap.getUiSettings ().setCompassEnabled (true) ;
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
 
-        /*LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        Location location;
-        try {
-            location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        // Getting Current Location
+        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location != null) {
             LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-        } catch (SecurityException e) {
-            Toast.makeText(this, "Erreur getLastKnowLocation GPS .", Toast.LENGTH_SHORT).show();
-        }*/
+        }
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location loc) {
+                LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        });
     }
+
+
+
 }

@@ -18,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 // TODO: 26/03/18  
@@ -45,7 +46,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-                intent.putExtra("cafet", aura);
+                ArrayList<Cafeteria> cafetArrList = new ArrayList<>(Arrays.asList(cafetList));
+                intent.putParcelableArrayListExtra("cafets", cafetArrList);
                 startActivity(intent);
             }
         });
@@ -81,21 +83,51 @@ public class MainActivity extends Activity {
                 }
 
 
-
-
-
-                /*LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-                Location location;
-                try {
-                    //location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    //LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
-                    //Toast.makeText(this, myCoordinates.toString(), Toast.LENGTH_SHORT).show();
-                } catch (SecurityException e) {
-                    //Toast.makeText(this, "Erreur getLastKnowLocation GPS .", Toast.LENGTH_SHORT).show();
-                };*/
             }
         });
+
     }
+
+
+    /*
+    LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    if (location != null) {
+        LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+    }
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, new LocationListener() {
+        @Override
+        public void onLocationChanged(Location loc) {
+            LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
+            for (Cafeteria cafet : cafetList) {
+                float dist = cafet.getLocation().distanceTo(myLocation);
+                cafet.setDistanceToMe((int)dist);
+            }
+            Arrays.sort(cafetList, new Comparator<Cafeteria>() {
+                @Override
+                public int compare(Cafeteria c1, Cafeteria c2) {
+                    return (c1.getDistanceToMe() - c2.getDistanceToMe());
+                }
+            });
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    });*/
 
     //Initialising data
     private Cafeteria aura = new Cafeteria("Aura",
@@ -117,7 +149,7 @@ public class MainActivity extends Activity {
                                             62.6036007,20.7420141,
                                             "Yliopistokatu 2 , 80100 Joensuu");
     private Cafeteria metla = new Cafeteria("Metla",
-                                            62.6036007,21.7420141,
+                                            62.6136007,29.8270141,
                                             "Yliopistokatu 2 , 80100 Joensuu");
     private Cafeteria verola = new Cafeteria("Verola",
                                             62.6036007,22.7420141,
