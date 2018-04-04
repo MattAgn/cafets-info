@@ -7,7 +7,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,8 +39,16 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         Button searchButton = findViewById(R.id.search_button);
+        Button mapButton = findViewById(R.id.map_button);
 
-
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                intent.putExtra("cafet", aura);
+                startActivity(intent);
+            }
+        });
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,20 +64,25 @@ public class MainActivity extends Activity {
                         return (c1.getDistanceToMe() - c2.getDistanceToMe());
                     }
                 });
-                for (Cafeteria cafet : cafetList) {
-                    Log.d("dist", String.valueOf(cafet.getDistanceToMe()));
+
+                //todo: add a refresh function (ie : delete previous views
+                ViewGroup resultContainer = findViewById(R.id.result_container);
+                LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                if (resultContainer.getChildCount() == 0) {
+                    for (int i=0; i< cafetList.length; i++){
+                        if (cafetList[i].getDistanceToMe() < maxDistance) {
+                            String text =  String.valueOf(i+1) + ". " + cafetList[i].getName() + " is at " + String.valueOf(cafetList[i].getDistanceToMe()) + "m";
+                            View result = inflater.inflate(R.layout.result_item, null);
+                            TextView resultText = (TextView) ((ViewGroup)result).getChildAt(0);
+                            resultText.setText(text);
+                            resultContainer.addView(result);
+                        }
+                    }
                 }
 
-                TextView textResult[] = new TextView[5];
-                textResult[0] = (TextView)findViewById(R.id.text_result_1);
-                textResult[1] = (TextView)findViewById(R.id.text_result_2);
-                textResult[2] = (TextView)findViewById(R.id.text_result_3);
-                textResult[3] = (TextView)findViewById(R.id.text_result_4);
-                textResult[4] = (TextView)findViewById(R.id.text_result_5);
-                for (int i = 0; i<5; i++){
-                    String text =  String.valueOf(i+1) + ". " + cafetList[i].getName() + " is at " + String.valueOf(cafetList[i].getDistanceToMe()) + "m";
-                    textResult[i].setText(text);
-                }
+
+
+
 
                 /*LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                 Location location;
@@ -90,7 +105,7 @@ public class MainActivity extends Activity {
                                             62.6048478,29.7422755,
                                             "Yliopistokatu 4, 80100 Joensuu");
     private Cafeteria futura = new Cafeteria("Futura, Natura and Metria",
-                                            62.6036007,29.74201292,
+                                            62.6036007,29.73201292,
                                             "Yliopistokatu 7 , 80100 Joensuu");
     private Cafeteria pipetti = new Cafeteria("Pipetti",
                                             62.6036007,29.730141,
@@ -110,11 +125,8 @@ public class MainActivity extends Activity {
 
     private Cafeteria[] cafetList = {aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola};
 
+    private int maxDistance = 1000;
 
-    /*mapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class));
-            }
-        });*/
+
+
 }

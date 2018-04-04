@@ -44,10 +44,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        Cafeteria cafet = getIntent().getExtras().getParcelable("cafet");
+        mMap.addMarker(new MarkerOptions().position(cafet.getCoordinates()).title("Marker in " + cafet.getName()));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(cafet.getCoordinates()));
 
         if (ContextCompat.checkSelfPermission (this.getApplicationContext (), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
@@ -57,7 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomGesturesEnabled (true) ;
         mMap.getUiSettings ().setCompassEnabled (true) ;
 
-        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        /*LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         Location location;
         try {
             location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -65,6 +64,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
         } catch (SecurityException e) {
             Toast.makeText(this, "Erreur getLastKnowLocation GPS .", Toast.LENGTH_SHORT).show();
-        }
+        }*/
     }
 }
