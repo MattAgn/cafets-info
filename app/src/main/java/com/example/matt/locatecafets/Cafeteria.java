@@ -1,6 +1,7 @@
 package com.example.matt.locatecafets;
 
 import android.graphics.Bitmap;
+import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -14,12 +15,17 @@ public class Cafeteria {
     private LatLng coordinates;
     private String website; //todo : change to URI&
     private String address;
+    private Location location;
+    private float distanceToMe;
 
     //Constructors
-    public Cafeteria(String name, LatLng coordinates, String address){
+    public Cafeteria(String name, double latitude, double longitude, String address){
         this.name = name;
         this.address = address;
-        this.coordinates = coordinates;
+        this.coordinates = new LatLng(latitude, longitude);
+        this.location = new Location(name);
+        location.setLongitude(longitude);
+        location.setLatitude(latitude);
     }
 
     //Getters
@@ -37,6 +43,18 @@ public class Cafeteria {
 
     public Bitmap getImage() {
         return image;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public float getDistanceToMe() {
+        return distanceToMe;
+    }
+
+    public void setDistanceToMe(float distanceToMe) {
+        this.distanceToMe = distanceToMe;
     }
 }
 

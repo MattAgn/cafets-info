@@ -13,6 +13,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Comparator;
 // TODO: 26/03/18  
 /* To pass, you must create a mobile app showing a simple listing of the cafeterias
  according to distance from the user. You must create a database of restaurants (at least 5)
@@ -44,51 +48,62 @@ public class MainActivity extends Activity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+                Location myLocation = aura.getLocation(); //to change, just for test purposes
+                for (Cafeteria cafet : cafetList) {
+                    float dist = cafet.getLocation().distanceTo(myLocation);
+                    cafet.setDistanceToMe(dist);
+                    //Log.d("dist", String.valueOf(cafet.getDistanceToMe()));
+                }
+                Arrays.sort(cafetList, new Comparator<Cafeteria>() {
+                    @Override
+                    public int compare(Cafeteria c1, Cafeteria c2) {
+                        return (int)(c1.getDistanceToMe() - c2.getDistanceToMe());
+                    }
+                });
+                for (Cafeteria cafet : cafetList) {
+                    Log.d("dist", String.valueOf(cafet.getDistanceToMe()));
+                }
+
+                /*LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                 Location location;
                 try {
-                    location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
-                    Log.d("coord", myCoordinates.toString());
+                    //location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    //LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
                     //Toast.makeText(this, myCoordinates.toString(), Toast.LENGTH_SHORT).show();
                 } catch (SecurityException e) {
                     //Toast.makeText(this, "Erreur getLastKnowLocation GPS .", Toast.LENGTH_SHORT).show();
-                };
+                };*/
             }
         });
     }
 
     //Initialising data
     private Cafeteria aura = new Cafeteria("Aura",
-                                            new LatLng(62.6036007,29.7420141),
+                                            62.6036007,29.7420141,
                                             "Yliopistokatu 2 , 80100 Joensuu");
     private Cafeteria carelia = new Cafeteria("Carelia",
-                                            new LatLng(62.6048478,29.7422755),
+                                            62.6048478,29.7422755,
                                             "Yliopistokatu 4, 80100 Joensuu");
     private Cafeteria futura = new Cafeteria("Futura, Natura and Metria",
-                                            new LatLng(62.6036007,29.7420141),
+                                            62.6036007,29.74201292,
                                             "Yliopistokatu 7 , 80100 Joensuu");
     private Cafeteria pipetti = new Cafeteria("Pipetti",
-                                            new LatLng(62.6036007,29.7420141),
+                                            62.6036007,29.730141,
                                             "Yliopistokatu 2 , 80100 Joensuu");
     private Cafeteria kuutti = new Cafeteria("Kuutti",
-                                            new LatLng(62.6036007,29.7420141),
+                                            62.6036007,26.7420141,
                                             "Yliopistokatu 2 , 80100 Joensuu");
     private Cafeteria pihlaja = new Cafeteria("Pihlaja",
-                                            new LatLng(62.6036007,29.7420141),
+                                            62.6036007,20.7420141,
                                             "Yliopistokatu 2 , 80100 Joensuu");
     private Cafeteria metla = new Cafeteria("Metla",
-                                            new LatLng(62.6036007,29.7420141),
+                                            62.6036007,21.7420141,
                                             "Yliopistokatu 2 , 80100 Joensuu");
     private Cafeteria verola = new Cafeteria("Verola",
-                                            new LatLng(62.6036007,29.7420141),
+                                            62.6036007,22.7420141,
                                             "Yliopistokatu 2 , 80100 Joensuu");
 
-    );
-
-
-
-
+    private Cafeteria[] cafetList = {aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola};
 
 
 }
