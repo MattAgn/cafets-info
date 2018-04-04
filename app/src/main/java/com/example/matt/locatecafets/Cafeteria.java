@@ -16,7 +16,7 @@ public class Cafeteria {
     private String website; //todo : change to URI&
     private String address;
     private Location location;
-    private float distanceToMe;
+    private int distanceToMe; //not clean
 
     //Constructors
     public Cafeteria(String name, double latitude, double longitude, String address){
@@ -49,11 +49,11 @@ public class Cafeteria {
         return location;
     }
 
-    public float getDistanceToMe() {
+    public int getDistanceToMe() {
         return distanceToMe;
     }
 
-    public void setDistanceToMe(float distanceToMe) {
+    public void setDistanceToMe(int distanceToMe) {
         this.distanceToMe = distanceToMe;
     }
 }

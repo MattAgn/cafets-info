@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,15 +36,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button mapButton = findViewById(R.id.map_button);
         Button searchButton = findViewById(R.id.search_button);
 
-        mapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class));
-            }
-        });
+
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,17 +46,27 @@ public class MainActivity extends Activity {
                 Location myLocation = aura.getLocation(); //to change, just for test purposes
                 for (Cafeteria cafet : cafetList) {
                     float dist = cafet.getLocation().distanceTo(myLocation);
-                    cafet.setDistanceToMe(dist);
-                    //Log.d("dist", String.valueOf(cafet.getDistanceToMe()));
+                    cafet.setDistanceToMe((int)dist);
                 }
                 Arrays.sort(cafetList, new Comparator<Cafeteria>() {
                     @Override
                     public int compare(Cafeteria c1, Cafeteria c2) {
-                        return (int)(c1.getDistanceToMe() - c2.getDistanceToMe());
+                        return (c1.getDistanceToMe() - c2.getDistanceToMe());
                     }
                 });
                 for (Cafeteria cafet : cafetList) {
                     Log.d("dist", String.valueOf(cafet.getDistanceToMe()));
+                }
+
+                TextView textResult[] = new TextView[5];
+                textResult[0] = (TextView)findViewById(R.id.text_result_1);
+                textResult[1] = (TextView)findViewById(R.id.text_result_2);
+                textResult[2] = (TextView)findViewById(R.id.text_result_3);
+                textResult[3] = (TextView)findViewById(R.id.text_result_4);
+                textResult[4] = (TextView)findViewById(R.id.text_result_5);
+                for (int i = 0; i<5; i++){
+                    String text =  String.valueOf(i+1) + ". " + cafetList[i].getName() + " is at " + String.valueOf(cafetList[i].getDistanceToMe()) + "m";
+                    textResult[i].setText(text);
                 }
 
                 /*LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -106,4 +111,10 @@ public class MainActivity extends Activity {
     private Cafeteria[] cafetList = {aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola};
 
 
+    /*mapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, MapsActivity.class));
+            }
+        });*/
 }
