@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="14dp">
 
 
     <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="17sp"
-        android:textColor="@color/common_google_signin_btn_text_light"
+        android:layout_width="200dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
         android:textAlignment="viewStart"
-        android:layout_weight="1" />
+        android:textColor="@color/common_google_signin_btn_text_light"
+        android:textSize="17sp" />
+
+    <ImageButton
+        android:id="@+id/webImgButton"
+        android:layout_width="40dp"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/ic_public_black_18dp"
+        android:contentDescription="@string/see_location" />
+
+    <ImageButton
+        android:id="@+id/locationImgButton"
+        android:layout_width="40dp"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/ic_location_on_black_18dp"
+        android:contentDescription="@string/see_location"
+        android:onClick="showLocation"/>
+
+
+
 
 </LinearLayout>

@@ -12,10 +12,13 @@ import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -37,6 +40,36 @@ import java.util.Comparator;
 
 public class MainActivity extends Activity {
 
+    //Initialising data
+    private Cafeteria aura = new Cafeteria("Aura",
+            62.6036007,29.7420141,
+            "Yliopistokatu 2 , 80100 Joensuu");
+    private Cafeteria carelia = new Cafeteria("Carelia",
+            62.6048478,29.7422755,
+            "Yliopistokatu 4, 80100 Joensuu");
+    private Cafeteria futura = new Cafeteria("Futura, Natura and Metria",
+            62.6036007,29.73201292,
+            "Yliopistokatu 7 , 80100 Joensuu");
+    private Cafeteria pipetti = new Cafeteria("Pipetti",
+            62.6036007,29.730141,
+            "Yliopistokatu 2 , 80100 Joensuu");
+    private Cafeteria kuutti = new Cafeteria("Kuutti",
+            62.6036007,26.7420141,
+            "Yliopistokatu 2 , 80100 Joensuu");
+    private Cafeteria pihlaja = new Cafeteria("Pihlaja",
+            62.6036007,20.7420141,
+            "Yliopistokatu 2 , 80100 Joensuu");
+    private Cafeteria metla = new Cafeteria("Metla",
+            62.6136007,29.8270141,
+            "Yliopistokatu 2 , 80100 Joensuu");
+    private Cafeteria verola = new Cafeteria("Verola",
+            62.6036007,22.7420141,
+            "Yliopistokatu 2 , 80100 Joensuu");
+
+    private Cafeteria[] cafetList = {aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola};
+
+    private int maxDistance = 1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +88,15 @@ public class MainActivity extends Activity {
             }
         });
 
+
+
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(
+                        getApplicationContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
@@ -68,23 +106,19 @@ public class MainActivity extends Activity {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 0, locationListener);
-                Location myLocation = aura.getLocation(); //to change, just for test purposes
-                for (Cafeteria cafet : cafetList) {
-                    float dist = cafet.getLocation().distanceTo(myLocation);
-                    cafet.setDistanceToMe((int)dist);
-                }
-                Arrays.sort(cafetList, new Comparator<Cafeteria>() {
-                    @Override
-                    public int compare(Cafeteria c1, Cafeteria c2) {
-                        return (c1.getDistanceToMe() - c2.getDistanceToMe());
+                LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 50, locationListener);
+                Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (myLocation != null) {
+                    updateOrderList(myLocation);
+                    ViewGroup resultContainer = findViewById(R.id.result_container);
+                    LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    int childCount = resultContainer.getChildCount();
+                    if ( childCount != 0) {
+                        for (int i = 0; i < childCount; i++) {
+                            resultContainer.removeViewAt(i);
+                        }
                     }
-                });
-
-                //todo: add a refresh function (ie : delete previous views
-                ViewGroup resultContainer = findViewById(R.id.result_container);
-                LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                if (resultContainer.getChildCount() == 0) {
                     for (int i=0; i< cafetList.length; i++){
                         if (cafetList[i].getDistanceToMe() < maxDistance) {
                             String text =  String.valueOf(i+1) + ". " + cafetList[i].getName() + " is at " + String.valueOf(cafetList[i].getDistanceToMe()) + "m";
@@ -94,82 +128,45 @@ public class MainActivity extends Activity {
                             resultContainer.addView(result);
                         }
                     }
+                } else  {
+                    Toast.makeText(MainActivity.this, "Position not found", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
     }
 
-
-
-    LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-    /*Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    if (location != null) {
-        LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-    }*/
+    public void updateOrderList(Location myLocation) {
+        for (Cafeteria cafet : cafetList) {
+            float dist = cafet.getLocation().distanceTo(myLocation);
+            cafet.setDistanceToMe((int)dist);
+        }
+        Arrays.sort(cafetList, new Comparator<Cafeteria>() {
+            @Override
+            public int compare(Cafeteria c1, Cafeteria c2) {
+                return (c1.getDistanceToMe() - c2.getDistanceToMe());
+            }
+        });
+    }
 
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
-            LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
-            for (Cafeteria cafet : cafetList) {
-                float dist = cafet.getLocation().distanceTo(myLocation);
-                cafet.setDistanceToMe((int)dist);
-            }
-            Arrays.sort(cafetList, new Comparator<Cafeteria>() {
-                @Override
-                public int compare(Cafeteria c1, Cafeteria c2) {
-                    return (c1.getDistanceToMe() - c2.getDistanceToMe());
-                }
-            });
+            updateOrderList(loc);
         }
-
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
         @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
+        public void onProviderEnabled(String provider) {}
         @Override
-        public void onProviderDisabled(String provider) {
+        public void onProviderDisabled(String provider) {}
+    };
 
-        }
-    });
-
-    //Initialising data
-    private Cafeteria aura = new Cafeteria("Aura",
-                                            62.6036007,29.7420141,
-                                            "Yliopistokatu 2 , 80100 Joensuu");
-    private Cafeteria carelia = new Cafeteria("Carelia",
-                                            62.6048478,29.7422755,
-                                            "Yliopistokatu 4, 80100 Joensuu");
-    private Cafeteria futura = new Cafeteria("Futura, Natura and Metria",
-                                            62.6036007,29.73201292,
-                                            "Yliopistokatu 7 , 80100 Joensuu");
-    private Cafeteria pipetti = new Cafeteria("Pipetti",
-                                            62.6036007,29.730141,
-                                            "Yliopistokatu 2 , 80100 Joensuu");
-    private Cafeteria kuutti = new Cafeteria("Kuutti",
-                                            62.6036007,26.7420141,
-                                            "Yliopistokatu 2 , 80100 Joensuu");
-    private Cafeteria pihlaja = new Cafeteria("Pihlaja",
-                                            62.6036007,20.7420141,
-                                            "Yliopistokatu 2 , 80100 Joensuu");
-    private Cafeteria metla = new Cafeteria("Metla",
-                                            62.6136007,29.8270141,
-                                            "Yliopistokatu 2 , 80100 Joensuu");
-    private Cafeteria verola = new Cafeteria("Verola",
-                                            62.6036007,22.7420141,
-                                            "Yliopistokatu 2 , 80100 Joensuu");
-
-    private Cafeteria[] cafetList = {aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola};
-
-    private int maxDistance = 1000;
-
-
-
+    public void showLocation(View v){
+        int indexCafet = ViewGroup.indexOfChild(v.getParent());
+        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+        ArrayList<Cafeteria> cafetArrList = new ArrayList<>(Arrays.asList(cafetList));
+        intent.putParcelableArrayListExtra("cafets", cafetArrList);
+        startActivity(intent);
+    }
 }
