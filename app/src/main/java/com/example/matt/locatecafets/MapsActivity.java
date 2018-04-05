@@ -73,6 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location != null) {
             LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+            mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         }
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, new LocationListener() {
@@ -80,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onLocationChanged(Location loc) {
                 LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+                mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
             }
 
             @Override
