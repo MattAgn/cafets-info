@@ -15,7 +15,7 @@
         android:textSize="17sp" />
 
     <ImageButton
-        android:id="@+id/webImgButton"
+        android:id="@+id/web_image_button"
         android:layout_width="40dp"
         android:layout_height="50dp"
         android:layout_weight="1"
@@ -23,13 +23,12 @@
         android:contentDescription="@string/see_location" />
 
     <ImageButton
-        android:id="@+id/locationImgButton"
+        android:id="@+id/location_image_button"
         android:layout_width="40dp"
         android:layout_height="50dp"
         android:layout_weight="1"
         app:srcCompat="@drawable/ic_location_on_black_18dp"
-        android:contentDescription="@string/see_location"
-        android:onClick="showLocation"/>
+        android:contentDescription="@string/see_location"/>
 
 
 

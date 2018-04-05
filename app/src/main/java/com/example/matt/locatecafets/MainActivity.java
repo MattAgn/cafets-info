@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -68,7 +69,7 @@ public class MainActivity extends Activity {
 
     private Cafeteria[] cafetList = {aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola};
 
-    private int maxDistance = 1000;
+    private int maxDistance = 10000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +127,18 @@ public class MainActivity extends Activity {
                             TextView resultText = (TextView) ((ViewGroup)result).getChildAt(0);
                             resultText.setText(text);
                             resultContainer.addView(result);
+                            final int indexCafet = i;
+                            ((ViewGroup)result).getChildAt(2).setOnClickListener(
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Cafeteria cafet = cafetList[indexCafet];
+                                        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                                        intent.putExtra("cafet", cafet);
+                                        startActivity(intent);
+                                    }
+                                }
+                            );
                         }
                     }
                 } else  {
@@ -162,11 +175,4 @@ public class MainActivity extends Activity {
         public void onProviderDisabled(String provider) {}
     };
 
-    public void showLocation(View v){
-        int indexCafet = ViewGroup.indexOfChild(v.getParent());
-        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-        ArrayList<Cafeteria> cafetArrList = new ArrayList<>(Arrays.asList(cafetList));
-        intent.putParcelableArrayListExtra("cafets", cafetArrList);
-        startActivity(intent);
-    }
 }

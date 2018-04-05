@@ -58,31 +58,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
-        // Getting Current Location
-        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
-        Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (myLocation != null) {
-            LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-            mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+        if (getIntent().getParcelableArrayListExtra("cafets") != null) {
+            // Getting Current Location
+            LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
+            Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (myLocation != null) {
+                LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+                mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+            }
+
+            ArrayList<Cafeteria> cafetArrList = getIntent().getParcelableArrayListExtra("cafets");
+            updateOrderList(myLocation, cafetArrList);
+            for (int i = 0; i < cafetArrList.size(); i++) {
+                if (i == 0) {
+                    //closest cafet is not in the same color
+                    mMap.addMarker(new MarkerOptions()
+                            .position(cafetArrList.get(i).getCoordinates())
+                            .title("Marker in " + cafetArrList.get(i).getName())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                } else {
+                    mMap.addMarker(new MarkerOptions()
+                            .position(cafetArrList.get(i).getCoordinates())
+                            .title("Marker in " + cafetArrList.get(i).getName()));
+                }
+            }
+        } else if (getIntent().getExtras().getParcelable("cafet") != null) {
+                Cafeteria cafet = getIntent().getExtras().getParcelable("cafet");
+                mMap.addMarker(new MarkerOptions()
+                        .position(cafet.getCoordinates())
+                        .title("Marker in " + cafet.getName()));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(cafet.getCoordinates()));
         }
 
-        ArrayList<Cafeteria> cafetArrList = getIntent().getParcelableArrayListExtra("cafets");
-        updateOrderList(myLocation, cafetArrList);
-        for (int i = 0; i < cafetArrList.size(); i++) {
-            if (i == 0){
-                //closest cafet is not in the same color
-                mMap.addMarker(new MarkerOptions()
-                        .position(cafetArrList.get(i).getCoordinates())
-                        .title("Marker in " + cafetArrList.get(i).getName())
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-            } else {
-                mMap.addMarker(new MarkerOptions()
-                        .position(cafetArrList.get(i).getCoordinates())
-                        .title("Marker in " + cafetArrList.get(i).getName()));
-            }
-        }
+
 
 
     }
