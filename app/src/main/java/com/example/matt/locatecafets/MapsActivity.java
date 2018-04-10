@@ -2,12 +2,20 @@ package com.example.matt.locatecafets;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -15,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -47,6 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        // TODO: 06/04/18 Animate closest marker 
         mMap = googleMap;
         mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
 
@@ -57,27 +67,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //creates the buttons for zoom and compass
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
+        mMap.setMinZoomPreference(13);
+        MyInfoWindow myInfoWindow = new MyInfoWindow(this);
+        mMap.setInfoWindowAdapter(myInfoWindow);
 
         if (getIntent().getParcelableArrayListExtra("cafets") != null) {
             // Getting Current Location
             LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            ArrayList<Cafeteria> cafetArrList = getIntent().getParcelableArrayListExtra("cafets");
             if (myLocation != null) {
                 LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-                mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                updateOrderList(myLocation, cafetArrList);
+            } else {
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(cafetArrList.get(0).getCoordinates()));
+                Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
             }
 
-            ArrayList<Cafeteria> cafetArrList = getIntent().getParcelableArrayListExtra("cafets");
-            updateOrderList(myLocation, cafetArrList);
             for (int i = 0; i < cafetArrList.size(); i++) {
                 if (i == 0) {
                     //closest cafet is not in the same color
-                    mMap.addMarker(new MarkerOptions()
+                    MarkerOptions markerOptions = new MarkerOptions()
                             .position(cafetArrList.get(i).getCoordinates())
                             .title("Marker in " + cafetArrList.get(i).getName())
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            .snippet("Closest to you");
+                    InfoWindowData info = new InfoWindowData();
+                    info.setImage("snowqualmie");
+                    Marker m = mMap.addMarker(markerOptions);
+                    m.setTag(info);
                 } else {
                     mMap.addMarker(new MarkerOptions()
                             .position(cafetArrList.get(i).getCoordinates())
@@ -92,9 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(cafet.getCoordinates()));
         }
 
-
-
-
+        mMap.setOnMarkerClickListener(markerClickListener);
     }
 
     public void updateOrderList(Location myLocation, ArrayList<Cafeteria> cafetArrList) {
@@ -125,6 +143,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onProviderDisabled(String provider) {}
     };
 
+    GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            if (marker.isInfoWindowShown()){
+                marker.hideInfoWindow();
+            } else {
+                marker.showInfoWindow();
+            }
+            return true;
+        }
+    };
 
 
+    /**
+     * Creates the menu of the app defined in menu_app.
+     * In our app, the menu is used to choose between the 3 modes of google map : Satellite, Normal and Hybrid
+     * @param menu The menu object of the app
+     * @return true to show proper execution
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_map, menu);
+        return true;
+    }
+
+    /**
+     * Sets google map to the Normal View
+     * Is triggered in the menu by pressing the Normal View Item
+     * @param item : the menu item corresponding to the normalView button
+     */
+    public void getNormalView(MenuItem item){
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    }
+
+    /**
+     * Sets google map to the Hybrid View
+     * Is triggered in the menu by pressing the Hybrid View Item
+     * @param item : the menu item corresponding to the hybridView button
+     */
+    public void getHybridView(MenuItem item){
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
+    /**
+     * Sets google map to the Satellite View
+     * Is triggered in the menu by pressing the Normal Satellite Item
+     * @param item the menu item corresponding to the satelliteView button
+     */
+    public void getSatelliteView(MenuItem item){
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
 }
