@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_margin="15dp"
+    android:layout_margin="40dp"
     tools:context="com.example.matt.locatecafets.MainActivity">
 
     <TextView
@@ -20,8 +20,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="337dp"
-        android:layout_height="223dp"
+        android:layout_width="match_parent"
+        android:layout_height="323dp"
         android:layout_weight="1"
         android:src="@drawable/common_full_open_on_phone" />
 
@@ -50,15 +50,6 @@
         android:layout_marginBottom="14dp"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="419dp" />
-
-    <LinearLayout
-        android:id="@+id/result_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-    </LinearLayout>
 
 
 </LinearLayout>

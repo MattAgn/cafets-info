@@ -22,7 +22,6 @@
         android:theme="@style/Material">
         <activity
             android:name=".MainActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
