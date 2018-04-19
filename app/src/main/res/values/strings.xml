@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LocateCafets</string>
+    <string name="app_name">Cafet'info</string>
     <string name="title_activity_maps">Map</string>
     <string name="view_maps">View on maps</string>
     <string name="get_cafeterias">Nearby cafeterias</string>
@@ -8,8 +8,5 @@
     <string name="normal_view">Normal view</string>
     <string name="hybrid_view">Hybrid view</string>
     <string name="satellite_view">Satellite view</string>
-
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="display_cafeterias">Display</string>
 </resources>
