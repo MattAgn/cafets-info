@@ -33,7 +33,7 @@ public class ListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-
+        /*
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
             if (getIntent().getParcelableArrayListExtra("cafets") != null) {
@@ -136,8 +136,8 @@ public class ListActivity extends Activity {
             }
 
         }
-    });
-}*/
+    });*/
+    }
 
     public void updateOrderList(Location myLocation, ArrayList<Cafeteria> cafetArrList) {
         for (Cafeteria cafet : cafetArrList) {
@@ -155,7 +155,7 @@ public class ListActivity extends Activity {
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
-            updateOrderList(loc);
+            //updateOrderList(loc);
         }
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {}

@@ -33,6 +33,7 @@ import java.util.Comparator;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private Cafeteria[] cafetList = Database.getCafeterias();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
