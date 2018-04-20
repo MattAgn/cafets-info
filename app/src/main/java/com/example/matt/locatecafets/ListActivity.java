@@ -14,6 +14,8 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,106 +26,61 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class ListActivity extends Activity {
 
     private int maxDistance = 1000;
+    private List<Cafeteria> cafetList = Database.getCafeterias();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-        /*
+
+        Spinner displaySpinner = (Spinner) findViewById(R.id.spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.display_range, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        displaySpinner.setAdapter(adapter);
+
+
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
-            if (getIntent().getParcelableArrayListExtra("cafets") != null) {
-                // Getting Current Location
-                LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
-                Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                ArrayList<Cafeteria> cafetArrList = getIntent().getParcelableArrayListExtra("cafets");
-                if (myLocation != null) {
-                    LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-                    updateOrderList(myLocation, cafetArrList);
-                    ViewGroup resultContainer = findViewById(R.id.result_container);
-                    LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    int childCount = resultContainer.getChildCount();
-                    if (childCount != 0) {
-                        for (int i = 0; i < childCount; i++) {
-                            resultContainer.removeViewAt(i);
-                        }
-                    }
-                    for (int i = 0; i < cafetList.length; i++) {
-                        if (cafetList[i].getDistanceToMe() < maxDistance) {
-                            String text = String.valueOf(i + 1) + ". " + cafetList[i].getName() + " is at " + String.valueOf(cafetList[i].getDistanceToMe()) + "m";
-                            View result = inflater.inflate(R.layout.result_item, null);
-                            TextView resultText = (TextView) ((ViewGroup) result).getChildAt(0);
-                            resultText.setText(text);
-                            resultContainer.addView(result);
-                            final int indexCafet = i;
-                            ((ViewGroup) result).getChildAt(2).setOnClickListener(
-                                    new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Cafeteria cafet = cafetList[indexCafet];
-                                            Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-                                            intent.putExtra("cafet", cafet);
-                                            startActivity(intent);
-                                        }
-                                    }
-                            );
-                        }
-                    }
-                } else {
-                    Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-
-        };
-
-    /*
-
-            if (ActivityCompat.checkSelfPermission(
-                    getApplicationContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
+            // Getting Current Location
             LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 50, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (myLocation != null) {
+                LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
                 updateOrderList(myLocation);
                 ViewGroup resultContainer = findViewById(R.id.result_container);
-                LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 int childCount = resultContainer.getChildCount();
-                if ( childCount != 0) {
+                if (childCount != 0) {
                     for (int i = 0; i < childCount; i++) {
                         resultContainer.removeViewAt(i);
                     }
                 }
-                for (int i=0; i< cafetList.length; i++){
-                    if (cafetList[i].getDistanceToMe() < maxDistance) {
-                        String text =  String.valueOf(i+1) + ". " + cafetList[i].getName() + " is at " + String.valueOf(cafetList[i].getDistanceToMe()) + "m";
+                for (int i = 0; i < cafetList.size(); i++) {
+                    if (cafetList.get(i).getDistanceToMe() < maxDistance) {
+                        String text = String.valueOf(i + 1) + ". " + cafetList.get(i).getName() +
+                                " is at " + String.valueOf(cafetList.get(i).getDistanceToMe()) + "m";
                         View result = inflater.inflate(R.layout.result_item, null);
-                        TextView resultText = (TextView) ((ViewGroup)result).getChildAt(0);
+                        TextView resultText = (TextView) ((ViewGroup) result).getChildAt(0);
                         resultText.setText(text);
                         resultContainer.addView(result);
                         final int indexCafet = i;
-                        ((ViewGroup)result).getChildAt(2).setOnClickListener(
+                        ((ViewGroup) result).getChildAt(2).setOnClickListener(
                                 new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Cafeteria cafet = cafetList[indexCafet];
-                                        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                                        Cafeteria cafet = cafetList.get(indexCafet);
+                                        Intent intent = new Intent(ListActivity.this, MapsActivity.class);
                                         intent.putExtra("cafet", cafet);
                                         startActivity(intent);
                                     }
@@ -131,20 +88,18 @@ public class ListActivity extends Activity {
                         );
                     }
                 }
-            } else  {
-                Toast.makeText(MainActivity.this, "Position not found", Toast.LENGTH_SHORT).show();
+            } else {
+                    Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
             }
-
         }
-    });*/
     }
 
-    public void updateOrderList(Location myLocation, ArrayList<Cafeteria> cafetArrList) {
-        for (Cafeteria cafet : cafetArrList) {
+    public void updateOrderList(Location myLocation) {
+        for (Cafeteria cafet : cafetList) {
             float dist = cafet.getLocation().distanceTo(myLocation);
             cafet.setDistanceToMe((int)dist);
         }
-        Collections.sort(cafetArrList, new Comparator<Cafeteria>() {
+        Collections.sort(cafetList, new Comparator<Cafeteria>() {
             @Override
             public int compare(Cafeteria c1, Cafeteria c2) {
                 return (c1.getDistanceToMe() - c2.getDistanceToMe());
@@ -155,7 +110,7 @@ public class ListActivity extends Activity {
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
-            //updateOrderList(loc);
+            updateOrderList(loc);
         }
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {}

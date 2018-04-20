@@ -8,5 +8,5 @@
     <string name="normal_view">Normal view</string>
     <string name="hybrid_view">Hybrid view</string>
     <string name="satellite_view">Satellite view</string>
-    <string name="display_cafeterias">Display</string>
+    <string name="display_cafeterias">Display All</string>
 </resources>

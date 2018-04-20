@@ -1,8 +1,10 @@
 package com.example.matt.locatecafets;
 
-/**
- * Created by matt on 20/04/18.
- */
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 public class Database {
 
@@ -32,8 +34,8 @@ public class Database {
             62.6036007, 22.7420141,
             "Yliopistokatu 2 , 80100 Joensuu");
 
-    static private Cafeteria[] cafetList = {aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola};
+    static private List<Cafeteria> cafetList = Arrays.asList(aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola);
 
-    static public Cafeteria[] getCafeterias() { return cafetList;}
+    static public List<Cafeteria> getCafeterias() { return cafetList;}
 
 }

@@ -29,11 +29,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private Cafeteria[] cafetList = Database.getCafeterias();
+    private List<Cafeteria> cafetList = Database.getCafeterias();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,16 +46,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // TODO: 06/04/18 Animate closest marker 
@@ -77,22 +68,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            ArrayList<Cafeteria> cafetArrList = getIntent().getParcelableArrayListExtra("cafets");
             if (myLocation != null) {
                 LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-                updateOrderList(myLocation, cafetArrList);
+                updateOrderList(myLocation);
             } else {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(cafetArrList.get(0).getCoordinates()));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(cafetList.get(0).getCoordinates()));
                 Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
             }
 
-            for (int i = 0; i < cafetArrList.size(); i++) {
+            for (int i = 0; i < cafetList.size(); i++) {
                 if (i == 0) {
                     //closest cafet is not in the same color
                     MarkerOptions markerOptions = new MarkerOptions()
-                            .position(cafetArrList.get(i).getCoordinates())
-                            .title("Marker in " + cafetArrList.get(i).getName())
+                            .position(cafetList.get(i).getCoordinates())
+                            .title("Marker in " + cafetList.get(i).getName())
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                             .snippet("Closest to you");
                     InfoWindowData info = new InfoWindowData();
@@ -101,8 +91,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     m.setTag(info);
                 } else {
                     mMap.addMarker(new MarkerOptions()
-                            .position(cafetArrList.get(i).getCoordinates())
-                            .title("Marker in " + cafetArrList.get(i).getName()));
+                            .position(cafetList.get(i).getCoordinates())
+                            .title("Marker in " + cafetList.get(i).getName()));
                 }
             }
         } else if (getIntent().getExtras().getParcelable("cafet") != null) {
@@ -116,12 +106,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(markerClickListener);
     }
 
-    public void updateOrderList(Location myLocation, ArrayList<Cafeteria> cafetArrList) {
-        for (Cafeteria cafet : cafetArrList) {
+    public void updateOrderList(Location myLocation) {
+        for (Cafeteria cafet : cafetList) {
             float dist = cafet.getLocation().distanceTo(myLocation);
             cafet.setDistanceToMe((int)dist);
         }
-        Collections.sort(cafetArrList, new Comparator<Cafeteria>() {
+        Collections.sort(cafetList, new Comparator<Cafeteria>() {
             @Override
             public int compare(Cafeteria c1, Cafeteria c2) {
                 return (c1.getDistanceToMe() - c2.getDistanceToMe());
