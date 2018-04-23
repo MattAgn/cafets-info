@@ -65,6 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setInfoWindowAdapter(myInfoWindow);
 
         if (getIntent().getExtras() != null) {
+            // if the users wants to see only one the cafeterias
             Cafeteria cafet = getIntent().getExtras().getParcelable("cafet");
             mMap.addMarker(new MarkerOptions()
                     .position(cafet.getCoordinates())
