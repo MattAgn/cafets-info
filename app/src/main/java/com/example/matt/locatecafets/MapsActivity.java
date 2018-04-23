@@ -1,6 +1,7 @@
 package com.example.matt.locatecafets;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -63,7 +64,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MyInfoWindow myInfoWindow = new MyInfoWindow(this);
         mMap.setInfoWindowAdapter(myInfoWindow);
 
-        if (getIntent().getParcelableArrayListExtra("cafets") != null) {
+        if (getIntent().getExtras() != null) {
+            Cafeteria cafet = getIntent().getExtras().getParcelable("cafet");
+            mMap.addMarker(new MarkerOptions()
+                    .position(cafet.getCoordinates())
+                    .title("Marker in " + cafet.getName()));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(cafet.getCoordinates()));
+        } else {
+            // We display all the cafeterias
             // Getting Current Location
             LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
@@ -95,12 +103,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .title("Marker in " + cafetList.get(i).getName()));
                 }
             }
-        } else if (getIntent().getExtras().getParcelable("cafet") != null) {
-                Cafeteria cafet = getIntent().getExtras().getParcelable("cafet");
-                mMap.addMarker(new MarkerOptions()
-                        .position(cafet.getCoordinates())
-                        .title("Marker in " + cafet.getName()));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(cafet.getCoordinates()));
         }
 
         mMap.setOnMarkerClickListener(markerClickListener);
@@ -146,43 +148,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
-
-    /**
-     * Creates the menu of the app defined in menu_app.
-     * In our app, the menu is used to choose between the 3 modes of google map : Satellite, Normal and Hybrid
-     * @param menu The menu object of the app
-     * @return true to show proper execution
-     */
+    // Menu for different views of the map
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_map, menu);
         return true;
     }
 
-    /**
-     * Sets google map to the Normal View
-     * Is triggered in the menu by pressing the Normal View Item
-     * @param item : the menu item corresponding to the normalView button
-     */
     public void getNormalView(MenuItem item){
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
-    /**
-     * Sets google map to the Hybrid View
-     * Is triggered in the menu by pressing the Hybrid View Item
-     * @param item : the menu item corresponding to the hybridView button
-     */
     public void getHybridView(MenuItem item){
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
     }
 
-    /**
-     * Sets google map to the Satellite View
-     * Is triggered in the menu by pressing the Normal Satellite Item
-     * @param item the menu item corresponding to the satelliteView button
-     */
     public void getSatelliteView(MenuItem item){
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
+
+    public void getListView(MenuItem item) {
+        Intent intent = new Intent(MapsActivity.this, ListActivity.class);
+        startActivity(intent);
     }
 }

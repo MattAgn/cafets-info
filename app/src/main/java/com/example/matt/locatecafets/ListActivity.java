@@ -98,9 +98,14 @@ public class ListActivity extends Activity {
         }
         // Showing the results
         for (int i = 0; i < cafetList.size(); i++) {
-            if (cafetList.get(i).getDistanceToMe() < maxDistance || maxDistance == -1) {
-                String text = String.valueOf(i + 1) + ". " + cafetList.get(i).getName() +
-                        " is at " + String.valueOf(cafetList.get(i).getDistanceToMe()) + "m";
+            int distance = cafetList.get(i).getDistanceToMe();
+            if ( distance < maxDistance || maxDistance == -1) {
+                String text = String.valueOf(i + 1) + ". " + cafetList.get(i).getName() + " is at ";
+                if (distance < 1000) {
+                    text += String.valueOf(distance) + "m";
+                } else {
+                    text += String.valueOf(Math.floor(distance / 100)/10 ) + "km";
+                }
                 View result = inflater.inflate(R.layout.result_item, null);
                 TextView resultText = (TextView) ((ViewGroup) result).getChildAt(0);
                 resultText.setText(text);
