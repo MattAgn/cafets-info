@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="display_range">
-        <item>Display all</item>
-        <item>Display &lt;100m</item>
-        <item>Display &lt;250m</item>
-        <item>Display &lt;500m</item>
-        <item>Display &lt;1000m</item>
+        <item>Display all cafeterias</item>
+        <item>In range &lt;100m</item>
+        <item>In range &lt;250m</item>
+        <item>In range &lt;500m</item>
+        <item>In range &lt;1000m</item>
     </string-array>
 </resources>

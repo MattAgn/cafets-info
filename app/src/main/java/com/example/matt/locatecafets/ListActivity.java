@@ -11,9 +11,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -30,7 +33,8 @@ import java.util.List;
 
 public class ListActivity extends Activity {
 
-    private int maxDistance = 1000;
+    private List<Integer> distanceValues = Database.getDistanceValues();
+    private int maxDistance = -1; //means default value is infinity
     private List<Cafeteria> cafetList = Database.getCafeterias();
 
     @Override
@@ -38,6 +42,7 @@ public class ListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        ViewGroup resultContainer = findViewById(R.id.result_container);
         Spinner displaySpinner = (Spinner) findViewById(R.id.spinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -46,7 +51,7 @@ public class ListActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         displaySpinner.setAdapter(adapter);
-
+        displaySpinner.setOnItemSelectedListener(spinnerListener);
 
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
@@ -58,38 +63,9 @@ public class ListActivity extends Activity {
             if (myLocation != null) {
                 LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
                 updateOrderList(myLocation);
-                ViewGroup resultContainer = findViewById(R.id.result_container);
-                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                int childCount = resultContainer.getChildCount();
-                if (childCount != 0) {
-                    for (int i = 0; i < childCount; i++) {
-                        resultContainer.removeViewAt(i);
-                    }
-                }
-                for (int i = 0; i < cafetList.size(); i++) {
-                    if (cafetList.get(i).getDistanceToMe() < maxDistance) {
-                        String text = String.valueOf(i + 1) + ". " + cafetList.get(i).getName() +
-                                " is at " + String.valueOf(cafetList.get(i).getDistanceToMe()) + "m";
-                        View result = inflater.inflate(R.layout.result_item, null);
-                        TextView resultText = (TextView) ((ViewGroup) result).getChildAt(0);
-                        resultText.setText(text);
-                        resultContainer.addView(result);
-                        final int indexCafet = i;
-                        ((ViewGroup) result).getChildAt(2).setOnClickListener(
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Cafeteria cafet = cafetList.get(indexCafet);
-                                        Intent intent = new Intent(ListActivity.this, MapsActivity.class);
-                                        intent.putExtra("cafet", cafet);
-                                        startActivity(intent);
-                                    }
-                                }
-                        );
-                    }
-                }
+                updateInterface();
             } else {
-                    Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -107,6 +83,44 @@ public class ListActivity extends Activity {
         });
     }
 
+    public void updateInterface() {
+        ViewGroup resultContainer = findViewById(R.id.result_container);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        int childCount = resultContainer.getChildCount();
+        // Cleaning the interface
+        Log.d("childCount", String.valueOf(childCount));
+        if (childCount != 0) {
+            for (int i = 0; i < childCount; i++) {
+                Log.d("child nb", String.valueOf(i));
+                resultContainer.removeViewAt(i);
+                Log.d("child removed", String.valueOf(i));
+            }
+        }
+        // Showing the results
+        for (int i = 0; i < cafetList.size(); i++) {
+            if (cafetList.get(i).getDistanceToMe() < maxDistance || maxDistance == -1) {
+                String text = String.valueOf(i + 1) + ". " + cafetList.get(i).getName() +
+                        " is at " + String.valueOf(cafetList.get(i).getDistanceToMe()) + "m";
+                View result = inflater.inflate(R.layout.result_item, null);
+                TextView resultText = (TextView) ((ViewGroup) result).getChildAt(0);
+                resultText.setText(text);
+                resultContainer.addView(result);
+                final int indexCafet = i;
+                ((ViewGroup) result).getChildAt(2).setOnClickListener(
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Cafeteria cafet = cafetList.get(indexCafet);
+                                Intent intent = new Intent(ListActivity.this, MapsActivity.class);
+                                intent.putExtra("cafet", cafet);
+                                startActivity(intent);
+                            }
+                        }
+                );
+            }
+        }
+    }
+
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
@@ -118,5 +132,18 @@ public class ListActivity extends Activity {
         public void onProviderEnabled(String provider) {}
         @Override
         public void onProviderDisabled(String provider) {}
+    };
+
+    AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            int newMaxDistance = distanceValues.get((int)id);
+            if (maxDistance != newMaxDistance ) {
+                updateInterface();
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {}
     };
 }

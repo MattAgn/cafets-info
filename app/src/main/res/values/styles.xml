@@ -1,7 +1,10 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="Material" parent="android:Theme.Material.Light.NoActionBar.Fullscreen">
+    <style name="MaterialFullScreen" parent="android:Theme.Material.Light.NoActionBar.Fullscreen">
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="Material" parent="android:Theme.Material.Light">
         <!-- Customize your theme here. -->
     </style>
 

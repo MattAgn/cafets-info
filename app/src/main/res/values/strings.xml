@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cafet'info</string>
+    <string name="app_name">Cafet\'info</string>
     <string name="title_activity_maps">Map</string>
     <string name="view_maps">View on maps</string>
     <string name="get_cafeterias">Nearby cafeterias</string>
