@@ -3,7 +3,11 @@ package com.example.matt.locatecafets;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +21,15 @@ import com.google.android.gms.maps.model.Marker;
 public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
 
     private Context context;
+    private int[] idImages = {
+            R.drawable.aura,
+            R.drawable.carelia,
+            R.drawable.futura,
+            R.drawable.louhi,
+            R.drawable.puisto,
+            R.drawable.forum,
+            R.drawable.melta
+    };
 
     public MyInfoWindow(Context ctx){
         context = ctx;
@@ -30,9 +43,17 @@ public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
     @Override
     public View getInfoContents(Marker marker) {
         View view = ((Activity)context).getLayoutInflater().inflate(R.layout.info_window, null);
+        final InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
 
         TextView locationTitle = view.findViewById(R.id.location_title_window);
         locationTitle.setText(marker.getTitle());
+
+        TextView websiteView= view.findViewById(R.id.website_view);
+        websiteView.setText(infoWindowData.getWebsite());
+
+
+        ImageView image = view.findViewById(R.id.image_view);
+        image.setImageResource(idImages[infoWindowData.getId()]);
 
         /*TextView details_tv = view.findViewById(R.id.details);
         ImageView img = view.findViewById(R.id.pic);
@@ -54,6 +75,7 @@ public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
         food_tv.setText(infoWindowData.getFood());
         transport_tv.setText(infoWindowData.getTransport());
         */
+
 
         return view;
     }

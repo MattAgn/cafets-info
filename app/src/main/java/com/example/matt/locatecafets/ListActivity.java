@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -117,6 +118,18 @@ public class ListActivity extends Activity {
                             }
                         }
                 );
+                ((ViewGroup) result).getChildAt(1).setOnClickListener(
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Cafeteria cafet = cafetList.get(indexCafet);
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse(cafet.getWebsite()));
+                                startActivity(intent);
+
+                            }
+                        }
+                );
             }
         }
     }
@@ -165,8 +178,10 @@ public class ListActivity extends Activity {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             int newMaxDistance = distanceValues.get((int)id);
+
             if (maxDistance != newMaxDistance ) {
                 maxDistance = newMaxDistance;
+                Log.d("newDist", String.valueOf(maxDistance));
                 handleLocation();
             }
         }

@@ -6,14 +6,16 @@ package com.example.matt.locatecafets;
 
 
 public class InfoWindowData {
-    private String image;
 
-    public String getImage() {
-        return image;
-    }
+    private String website;
+    private int id;
 
-    public void setImage(String image) {
-        this.image = image;
-    }
+    public int getId() { return id;}
+
+    public String getWebsite() {return website; }
+
+    public void setId(int id) { this.id = id; }
+
+    public void setWebsite(String website) { this.website = website; }
 
 }

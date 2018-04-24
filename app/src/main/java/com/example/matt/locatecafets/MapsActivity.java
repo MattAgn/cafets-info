@@ -69,7 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Cafeteria cafet = getIntent().getExtras().getParcelable("cafet");
             mMap.addMarker(new MarkerOptions()
                     .position(cafet.getCoordinates())
-                    .title("Marker in " + cafet.getName()));
+                    .title(cafet.getName()));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(cafet.getCoordinates()));
         } else {
             // We display all the cafeterias
@@ -87,21 +87,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             for (int i = 0; i < cafetList.size(); i++) {
+                Cafeteria cafet = cafetList.get(i);
                 if (i == 0) {
                     //closest cafet is not in the same color
+
                     MarkerOptions markerOptions = new MarkerOptions()
-                            .position(cafetList.get(i).getCoordinates())
-                            .title("Marker in " + cafetList.get(i).getName())
+                            .position(cafet.getCoordinates())
+                            .title(cafetList.get(i).getName())
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                             .snippet("Closest to you");
                     InfoWindowData info = new InfoWindowData();
-                    info.setImage("snowqualmie");
+                    info.setWebsite(cafet.getWebsite());
+                    info.setId(cafet.getId());
                     Marker m = mMap.addMarker(markerOptions);
                     m.setTag(info);
                 } else {
-                    mMap.addMarker(new MarkerOptions()
+                    MarkerOptions markerOptions = new MarkerOptions()
                             .position(cafetList.get(i).getCoordinates())
-                            .title("Marker in " + cafetList.get(i).getName()));
+                            .title(cafetList.get(i).getName());
+                    InfoWindowData info = new InfoWindowData();
+                    info.setId(cafet.getId());
+                    info.setWebsite(cafet.getWebsite());
+                    Marker m = mMap.addMarker(markerOptions);
+                    m.setTag(info);
                 }
             }
         }

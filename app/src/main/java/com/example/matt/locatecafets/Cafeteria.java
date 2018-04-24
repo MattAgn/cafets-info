@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class Cafeteria implements Parcelable {
 
     //Attributes
-    private static int lastId;
+    private static int lastId = -1;
     private int id;
     private String name;
     private Bitmap image;
@@ -25,7 +25,7 @@ public class Cafeteria implements Parcelable {
     private int distanceToMe; //not clean
 
     //Constructors
-    public Cafeteria(String name, double latitude, double longitude, String address){
+    public Cafeteria(String name, double latitude, double longitude, String address, String website){
         this.id = lastId + 1;
         lastId ++;
         this.name = name;
@@ -34,6 +34,7 @@ public class Cafeteria implements Parcelable {
         this.location = new Location(name);
         location.setLongitude(longitude);
         location.setLatitude(latitude);
+        this.website = website;
     }
 
     protected Cafeteria(Parcel in) {
@@ -59,6 +60,8 @@ public class Cafeteria implements Parcelable {
     };
 
     //Getters
+    public int getId() { return this.id; }
+
     public LatLng getCoordinates(){
         return this.coordinates;
     }
@@ -78,6 +81,8 @@ public class Cafeteria implements Parcelable {
     public Location getLocation() {
         return location;
     }
+
+    public String getWebsite() { return website; }
 
     public int getDistanceToMe() {
         return distanceToMe;

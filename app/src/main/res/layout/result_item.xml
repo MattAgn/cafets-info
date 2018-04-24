@@ -20,7 +20,7 @@
         android:id="@+id/web_image_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_public_black_18dp"
+        android:src="@drawable/ic_info_outline_black_24dp"
         android:contentDescription="@string/see_location" />
 
     <ImageButton
