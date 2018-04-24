@@ -8,6 +8,7 @@ import java.util.List;
 
 public class Database {
 
+    // TODO: issue with natura, futura and borealis, all at the same address
     //Initialising data
     static private Cafeteria aura = new Cafeteria(
             "Aura",
@@ -15,34 +16,30 @@ public class Database {
             "Yliopistokatu 2 , 80100 Joensuu");
     static private Cafeteria carelia = new Cafeteria(
             "Carelia",
-            62.6048478, 29.7422755,
+            62.6036502, 29.7442225,
             "Yliopistokatu 4, 80100 Joensuu");
     static private Cafeteria futura = new Cafeteria(
             "Futura",
-            62.6036007, 29.73201292,
+            62.6050013, 29.7388577,
             "Yliopistokatu 7 , 80100 Joensuu");
-    static private Cafeteria pipetti = new Cafeteria(
-            "Pipetti",
-            62.6036007, 29.730141,
-            "Yliopistokatu 2 , 80100 Joensuu");
-    static private Cafeteria kuutti = new Cafeteria(
-            "Kuutti",
-            62.6036007, 26.7420141,
-            "Yliopistokatu 2 , 80100 Joensuu");
-    static private Cafeteria pihlaja = new Cafeteria(
-            "Pihlaja",
-            62.6036007, 20.7420141,
-            "Yliopistokatu 2 , 80100 Joensuu");
+    static private Cafeteria louhi = new Cafeteria(
+            "Louhi",
+            62.5982607, 29.743439,
+            "Länsikatu 15, 80110 Joensuu, Finland");
+    static private Cafeteria puisto = new Cafeteria(
+            "Puisto",
+            62.5986341, 29.7425244,
+            "Länsikatu 15, 80110 Joensuu");
+    static private Cafeteria forum = new Cafeteria(
+            "Kahvila Forum",
+            62.5979712, 29.7403693,
+            "Linnunlahdentie 2, 80110 Joensuu");
     static private Cafeteria metla = new Cafeteria(
             "Metla",
-            62.6136007, 29.8270141,
-            "Yliopistokatu 2 , 80100 Joensuu");
-    static private Cafeteria verola = new Cafeteria(
-            "Verola",
-            62.6036007, 22.7420141,
-            "Yliopistokatu 2 , 80100 Joensuu");
+            62.6049134, 29.7414604,
+            "Yliopistokatu 6 , 80100 Joensuu");
 
-    static private List<Cafeteria> cafetList = Arrays.asList(aura, carelia, futura, pipetti, kuutti, pihlaja, metla, verola);
+    static private List<Cafeteria> cafetList = Arrays.asList(aura, carelia, futura, louhi, puisto, forum, metla);
 
     static private List<Integer> distanceValues = Arrays.asList(-1, 100, 250, 500, 1000);
 

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,8 +44,8 @@ public class ListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        ViewGroup resultContainer = findViewById(R.id.result_container);
-        Spinner displaySpinner = (Spinner) findViewById(R.id.spinner);
+        ImageButton refreshButton = findViewById(R.id.refresh_image_button);
+        Spinner displaySpinner = findViewById(R.id.spinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.display_range, android.R.layout.simple_spinner_item);
@@ -53,23 +55,12 @@ public class ListActivity extends Activity {
         displaySpinner.setAdapter(adapter);
         displaySpinner.setOnItemSelectedListener(spinnerListener);
 
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
+        refreshButton.setOnClickListener(refreshClickListener);
 
-            // Getting Current Location
-            LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
-            Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (myLocation != null) {
-                LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-                updateOrderList(myLocation);
-                updateInterface();
-            } else {
-                Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
-            }
-        }
+        handleLocation();
     }
 
+    //Helper functions
     public void updateOrderList(Location myLocation) {
         for (Cafeteria cafet : cafetList) {
             float dist = cafet.getLocation().distanceTo(myLocation);
@@ -92,7 +83,11 @@ public class ListActivity extends Activity {
         if (childCount != 0) {
             for (int i = 0; i < childCount; i++) {
                 Log.d("child nb", String.valueOf(i));
-                resultContainer.removeViewAt(i);
+                try {
+                    resultContainer.removeViewAt(i);
+                } catch (java.lang.NullPointerException error) {
+                    Log.d("error", error.getMessage());
+                };
                 Log.d("child removed", String.valueOf(i));
             }
         }
@@ -126,6 +121,26 @@ public class ListActivity extends Activity {
         }
     }
 
+    // Main function
+    public void handleLocation() {
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
+
+            // Getting Current Location
+            LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
+            Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (myLocation != null) {
+                LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+                updateOrderList(myLocation);
+                updateInterface();
+            } else {
+                Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //Listeners
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
@@ -139,12 +154,20 @@ public class ListActivity extends Activity {
         public void onProviderDisabled(String provider) {}
     };
 
+    View.OnClickListener refreshClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            handleLocation();
+        }
+    };
+
     AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             int newMaxDistance = distanceValues.get((int)id);
             if (maxDistance != newMaxDistance ) {
-                updateInterface();
+                maxDistance = newMaxDistance;
+                handleLocation();
             }
         }
 
