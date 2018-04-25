@@ -28,7 +28,7 @@ public class Database {
     static private Cafeteria louhi = new Cafeteria(
             "Louhi",
             62.5982607, 29.743439,
-            "Länsikatu 15, 80110 Joensuu, Finland",
+            "Länsikatu 15, 80110 Joensuu",
             "http://mehtimakiravintolat.fi/ravintola-louhi/");
     static private Cafeteria puisto = new Cafeteria(
             "Puisto",

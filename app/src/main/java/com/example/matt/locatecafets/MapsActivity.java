@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -52,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // TODO: 06/04/18 Animate closest marker 
+        // TODO: 25/04/18 Add button to go to closest marker ? 
         mMap = googleMap;
         mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
 
@@ -75,10 +77,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .title(selectedCafet.getName());
             InfoWindowData info = new InfoWindowData();
             info.setId(selectedCafet.getId());
+            info.setAddress(selectedCafet.getAddress());
             Marker m = mMap.addMarker(markerOptions);
             m.setTag(info);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(selectedCafet.getCoordinates()));
         }
+
         // We display all the cafeterias
         // Getting Current Location
         LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
@@ -104,7 +108,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (int i = 0; i < cafetList.size(); i++) {
             Cafeteria cafet = cafetList.get(i);
             // TODO: animate closest
-            if (i == 0 && cafet.getId() != selectedCafet.getId()) {
+            if (i == 0 && (selectedCafet == null || selectedCafet.getId() != cafet.getId())) {
                 //closest cafet is not in the same color
 
                 MarkerOptions markerOptions = new MarkerOptions()
@@ -114,15 +118,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .snippet("Closest to you");
                 InfoWindowData info = new InfoWindowData();
                 info.setId(cafet.getId());
+                info.setAddress(cafet.getAddress());
                 Marker m = mMap.addMarker(markerOptions);
                 m.setTag(info);
-            } else if (cafet.getId() != selectedCafet.getId()) {
+            } else if (selectedCafet == null || selectedCafet.getId() != cafet.getId()) {
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(cafetList.get(i).getCoordinates())
                         .title(cafetList.get(i).getName());
                 Log.d("cafet", String.valueOf(cafet.getId()));
                 InfoWindowData info = new InfoWindowData();
                 info.setId(cafet.getId());
+                info.setAddress(cafet.getAddress());
                 Marker m = mMap.addMarker(markerOptions);
                 m.setTag(info);
             }

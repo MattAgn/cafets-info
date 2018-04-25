@@ -36,19 +36,14 @@
     </LinearLayout>
 
     <ScrollView
+        android:id="@+id/wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_below="@id/first_layout"
         tools:ignore="UnknownId">
 
-        <LinearLayout
-            android:id="@+id/result_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
-        </LinearLayout>
+
 
     </ScrollView>
 

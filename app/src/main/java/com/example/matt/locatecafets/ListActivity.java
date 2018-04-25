@@ -21,6 +21,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,27 +77,22 @@ public class ListActivity extends Activity {
     }
 
     public void updateInterface() {
-        ViewGroup resultContainer = findViewById(R.id.result_container);
+        ViewGroup wrapper = findViewById(R.id.wrapper);
+        LinearLayout resultContainer = new LinearLayout(this);
+        resultContainer.setOrientation(LinearLayout.VERTICAL);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        int childCount = resultContainer.getChildCount();
+        int childCount = wrapper.getChildCount();
         // Cleaning the interface
         Log.d("childCount", String.valueOf(childCount));
         if (childCount != 0) {
-            for (int i = 0; i < childCount; i++) {
-                Log.d("child nb", String.valueOf(i));
-                try {
-                    resultContainer.removeViewAt(i);
-                } catch (java.lang.NullPointerException error) {
-                    Log.d("error", error.getMessage());
-                };
-                Log.d("child removed", String.valueOf(i));
-            }
+            wrapper.removeViewAt(0);
         }
         // Showing the results
         for (int i = 0; i < cafetList.size(); i++) {
-            int distance = cafetList.get(i).getDistanceToMe();
+            final Cafeteria cafet = cafetList.get(i);
+            int distance = cafet.getDistanceToMe();
             if ( distance < maxDistance || maxDistance == -1) {
-                String text = String.valueOf(i + 1) + ". " + cafetList.get(i).getName() + " is at ";
+                String text = String.valueOf(i + 1) + ". " + cafet.getName() + " is at ";
                 if (distance < 1000) {
                     text += String.valueOf(distance) + "m";
                 } else {
@@ -106,12 +102,10 @@ public class ListActivity extends Activity {
                 TextView resultText = (TextView) ((ViewGroup) result).getChildAt(0);
                 resultText.setText(text);
                 resultContainer.addView(result);
-                final int indexCafet = i;
                 ((ViewGroup) result).getChildAt(2).setOnClickListener(
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Cafeteria cafet = cafetList.get(indexCafet);
                                 Intent intent = new Intent(ListActivity.this, MapsActivity.class);
                                 intent.putExtra("cafet", cafet);
                                 startActivity(intent);
@@ -123,16 +117,15 @@ public class ListActivity extends Activity {
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Cafeteria cafet = cafetList.get(indexCafet);
                                 Intent intent = new Intent(Intent.ACTION_VIEW);
                                 intent.setData(Uri.parse(cafet.getWebsite()));
                                 startActivity(intent);
-
                             }
                         }
                 );
             }
         }
+        wrapper.addView(resultContainer);
     }
 
     // Main function

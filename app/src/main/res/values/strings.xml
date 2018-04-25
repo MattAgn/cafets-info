@@ -11,7 +11,8 @@
     <string name="list_view">See list</string>
     <string name="display_cafeterias">Display All</string>
     <string name="refresh">Refresh</string>
-    <string name="opening_hours">Opening hours</string>
+    <string name="opening_hours">Opening hours :</string>
+    <string name="address">Address :</string>
     <string name="image_description">image of restaurant</string>
 
 </resources>

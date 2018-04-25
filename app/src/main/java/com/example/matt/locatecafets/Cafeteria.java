@@ -38,6 +38,7 @@ public class Cafeteria implements Parcelable {
     }
 
     protected Cafeteria(Parcel in) {
+        id = in.readInt();
         name = in.readString();
         image = in.readParcelable(Bitmap.class.getClassLoader());
         coordinates = in.readParcelable(LatLng.class.getClassLoader());
@@ -99,6 +100,7 @@ public class Cafeteria implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(name);
         dest.writeParcelable(image, flags);
         dest.writeParcelable(coordinates, flags);
