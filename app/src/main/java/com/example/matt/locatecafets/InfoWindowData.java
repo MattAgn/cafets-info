@@ -7,15 +7,15 @@ package com.example.matt.locatecafets;
 
 public class InfoWindowData {
 
-    private String website;
+    private String openingHours;
     private int id;
 
     public int getId() { return id;}
 
-    public String getWebsite() {return website; }
+    public String getOpeningHours() {return openingHours; }
 
     public void setId(int id) { this.id = id; }
 
-    public void setWebsite(String website) { this.website = website; }
+    public void setOpeningHours(String openingHours) { this.openingHours = openingHours; }
 
 }

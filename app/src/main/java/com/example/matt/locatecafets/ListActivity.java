@@ -118,6 +118,7 @@ public class ListActivity extends Activity {
                             }
                         }
                 );
+                // TODO: include warning message, about to leave app
                 ((ViewGroup) result).getChildAt(1).setOnClickListener(
                         new View.OnClickListener() {
                             @Override
