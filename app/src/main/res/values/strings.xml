@@ -14,5 +14,6 @@
     <string name="opening_hours">Opening hours :</string>
     <string name="address">Address :</string>
     <string name="image_description">image of restaurant</string>
+    <string name="activate_gps">To fully use the app, don\'t forget to turn your GPS on</string>
 
 </resources>
