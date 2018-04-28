@@ -61,13 +61,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
             mMap.setMyLocationEnabled(true);
         }
-        //creates the buttons for zoom and compass
+
+        // Creates the buttons for zoom and compass
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
-        mMap.setMinZoomPreference(13);
         MyInfoWindow myInfoWindow = new MyInfoWindow(this);
         mMap.setInfoWindowAdapter(myInfoWindow);
+        mMap.setOnMarkerClickListener(markerClickListener);
 
+        // Displays different markers
+        Location myLocation = getLocation();
+        displaySelectedCafet();
+        displayMarkers(myLocation);
+    }
+
+
+    public void displaySelectedCafet() {
         if (getIntent().getExtras() != null) {
             // if the users wants to see only one the cafeterias
             selectedCafet = getIntent().getExtras().getParcelable("cafet");
@@ -81,39 +90,58 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Marker m = mMap.addMarker(markerOptions);
             m.setTag(info);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(selectedCafet.getCoordinates()));
+            m.showInfoWindow();
         }
+    }
 
-        // We display all the cafeterias
-        // Getting Current Location
-        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
-        Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    public Location getLocation() {
+        if (mMap != null) {
+            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
+                mMap.setMyLocationEnabled(true);
+            }
+            LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
+            Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        // We move the camera on user if possible
-        if (myLocation != null && selectedCafet == null) {
-            LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-        } else if (selectedCafet == null) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(cafetList.get(0).getCoordinates()));
+            // We force the user to give his GPS location
+            /*
+            if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                Intent intent = new Intent( android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS) ;
+                startActivityForResult(intent, 1);
+            }*/
+
+            // We move the camera on user if possible
+            if (myLocation != null && selectedCafet == null) {
+                LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+            } else if (selectedCafet == null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(cafetList.get(0).getCoordinates()));
+            }
+
+            // We sort the list by distance to user
+            if (myLocation != null) {
+                updateOrderList(myLocation);
+            } else {
+                Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
+            }
+            return myLocation;
         }
+        return null;
+    }
 
-        // We sort the list by distance to user
+    public void displayMarkers(Location myLocation) {
         if (myLocation != null) {
             updateOrderList(myLocation);
-        } else {
-            Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
         }
-
-        // Display markers
         for (int i = 0; i < cafetList.size(); i++) {
             Cafeteria cafet = cafetList.get(i);
             // TODO: animate closest
-            if (i == 0 && (selectedCafet == null || selectedCafet.getId() != cafet.getId())) {
+            if (i == 0 && myLocation !=null && (selectedCafet == null || selectedCafet.getId() != cafet.getId())) {
                 //closest cafet is not in the same color
-
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(cafet.getCoordinates())
-                        .title(cafetList.get(i).getName())
+                        .title(cafetList.get(i).getName() + " (closest)")
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                         .snippet("Closest to you");
                 InfoWindowData info = new InfoWindowData();
@@ -132,10 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Marker m = mMap.addMarker(markerOptions);
                 m.setTag(info);
             }
-
         }
-
-        mMap.setOnMarkerClickListener(markerClickListener);
     }
 
     public void updateOrderList(Location myLocation) {
@@ -151,19 +176,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    // Listeners
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
+            mMap.clear();
             if (selectedCafet == null) {
                 LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
                 mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+            } else {
+                displaySelectedCafet();
             }
+            displayMarkers(loc);
         }
+
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // If GPS is activated or disactivated, we update the markers
+            //TODO: not really working when GPS disabled
+            Log.d("Status change", String.valueOf(status));
+            Location myLocation = getLocation();
+            mMap.clear();
+            if (selectedCafet != null) {
+                displaySelectedCafet();
+            }
+            displayMarkers(myLocation);
+            //TODO: weird, if condition below not working when GPS desactivated
+            //if (provider == LocationManager.GPS_PROVIDER) {
+        }
+
         @Override
         public void onProviderEnabled(String provider) {}
+
         @Override
         public void onProviderDisabled(String provider) {}
     };
@@ -179,6 +224,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return true;
         }
     };
+
 
     // Menu for different views of the map
     @Override

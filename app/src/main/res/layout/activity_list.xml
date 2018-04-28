@@ -42,9 +42,6 @@
         android:layout_below="@id/first_layout"
         tools:ignore="UnknownId">
 
-
-
-
     </ScrollView>
 
 

@@ -80,6 +80,8 @@ public class ListActivity extends Activity {
         ViewGroup wrapper = findViewById(R.id.wrapper);
         LinearLayout resultContainer = new LinearLayout(this);
         resultContainer.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        resultContainer.setLayoutParams(params);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         int childCount = wrapper.getChildCount();
         // Cleaning the interface
@@ -92,7 +94,7 @@ public class ListActivity extends Activity {
             final Cafeteria cafet = cafetList.get(i);
             int distance = cafet.getDistanceToMe();
             if ( distance < maxDistance || maxDistance == -1) {
-                String text = String.valueOf(i + 1) + ". " + cafet.getName() + " is at ";
+                String text = String.valueOf(i + 1) + ". " + cafet.getName() + " - ";
                 if (distance < 1000) {
                     text += String.valueOf(distance) + "m";
                 } else {
