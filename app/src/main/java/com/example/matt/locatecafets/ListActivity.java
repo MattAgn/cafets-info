@@ -29,6 +29,8 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -126,6 +128,11 @@ public class ListActivity extends Activity {
                         }
                 );
             }
+            if (resultContainer.getChildCount() == 0) {
+                TextView textView = new TextView(this);
+                textView.setText("No cafeteria found in this range");
+                resultContainer.addView(textView);
+            }
         }
         wrapper.addView(resultContainer);
     }
@@ -139,28 +146,56 @@ public class ListActivity extends Activity {
             LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
             if (myLocation != null) {
-                LatLng myCoordinates = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
                 updateOrderList(myLocation);
                 updateInterface();
             } else {
-                Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please activate your GPS", Toast.LENGTH_LONG).show();
             }
+
+            // Ask the user to activate GPS
+            if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                Intent intent = new Intent( android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS) ;
+                startActivityForResult(intent, 1);
+            }
+
         }
+
     }
 
     //Listeners
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
-            updateOrderList(loc);
+            handleLocation();
         }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            if (provider == LocationManager.GPS_PROVIDER) {
+                handleLocation();
+            }
+        }
+
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {}
+
         @Override
-        public void onProviderEnabled(String provider) {}
-        @Override
-        public void onProviderDisabled(String provider) {}
+        public void onProviderDisabled(String provider) {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
+
+                Toast.makeText(getApplicationContext(), "Please activate your GPS", Toast.LENGTH_LONG).show();
+
+                // Ask the user to activate GPS
+                LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+                if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                    Intent intent = new Intent( android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS) ;
+                    startActivityForResult(intent, 1);
+                }
+
+            }        }
     };
 
     View.OnClickListener refreshClickListener = new View.OnClickListener() {
@@ -174,10 +209,8 @@ public class ListActivity extends Activity {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             int newMaxDistance = distanceValues.get((int)id);
-
             if (maxDistance != newMaxDistance ) {
                 maxDistance = newMaxDistance;
-                Log.d("newDist", String.valueOf(maxDistance));
                 handleLocation();
             }
         }
