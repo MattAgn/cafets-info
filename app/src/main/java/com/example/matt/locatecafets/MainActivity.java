@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-
+//test
 // TODO: 26/03/18  
 /* To pass, you must create a mobile app showing a simple listing of the cafeterias
  according to distance from the user. You must create a database of restaurants (at least 5)

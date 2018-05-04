@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LocateCafets.iml" filepath="$PROJECT_DIR$/LocateCafets.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/cafets-info_essai.iml" filepath="$PROJECT_DIR$/.idea/cafets-info_essai.iml" />
     </modules>
   </component>
 </project>
