@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Cafet\'info</string>
     <string name="title_activity_maps">Map</string>
-    <string name="view_maps">View on maps</string>
-    <string name="get_cafeterias">Nearby cafeterias</string>
+    <string name="view_maps">Maps view</string>
+    <string name="get_cafeterias">List view</string>
     <string name="see_location">See location</string>
     <string name="see_website">See website</string>
     <string name="normal_view">Normal map view</string>
@@ -15,5 +15,6 @@
     <string name="address">Address :</string>
     <string name="image_description">image of restaurant</string>
     <string name="activate_gps">To fully use the app, don\'t forget to turn your GPS on</string>
+    <string name="no_cafet">No cafeteria found in this range</string>
 
 </resources>

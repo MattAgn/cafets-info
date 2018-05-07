@@ -104,12 +104,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-            // We force the user to give his GPS location
-            /*
-            if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                Intent intent = new Intent( android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS) ;
-                startActivityForResult(intent, 1);
-            }*/
 
             // We move the camera on user if possible
             if (myLocation != null && selectedCafet == null) {
