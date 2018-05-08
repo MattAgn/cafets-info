@@ -241,6 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
+    //
 
     // Menu for different views of the map
     @Override
