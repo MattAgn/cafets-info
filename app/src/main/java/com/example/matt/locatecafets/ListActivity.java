@@ -172,7 +172,7 @@ public class ListActivity extends Activity {
                     updateOrderList(myLocation);
                     updateInterface();
                 } else {
-                    Toast.makeText(this, "Please activate your GPS", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Waiting for GPS position", Toast.LENGTH_LONG).show();
                 }
             }
         }
