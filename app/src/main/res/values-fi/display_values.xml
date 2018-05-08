@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="display_range">
+        <item>Kaikki kaupassasi olevat kahvilat</item>
+        <item>Säteen säteellä 100m</item>
+        <item>Säteen säteellä 250m</item>
+        <item>Säteen säteellä 500m</item>
+        <item>Säteen säteellä 1000m</item>
+    </string-array>
+</resources>

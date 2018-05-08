@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Cafet\'info</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="view_maps">Carte</string>
+    <string name="get_cafeterias">Liste</string>
+    <string name="see_location">Voir localisation</string>
+    <string name="see_website">Voir siteweb</string>
+    <string name="normal_view">Vue carte normale</string>
+    <string name="hybrid_view">Vue carte hybride</string>
+    <string name="satellite_view">Vue satelitte</string>
+    <string name="list_view">Voir liste cafets</string>
+    <string name="display_cafeterias">Voir toutes les cafets</string>
+    <string name="refresh">Rafraîchir</string>
+    <string name="opening_hours">Heures d\'ouverture</string>
+    <string name="address">Adresse :</string>
+    <string name="image_description">image du restaurant</string>
+    <string name="activate_gps">To fully use the app, don\'t forget to turn your GPS on</string>
+    <string name="no_cafet">Pas de cafetérias trouvées à cette distance</string>
+    <string name="waiting_gps">En attende de la position GPS</string>
+    <string name="closest">(plus proche)</string>
+    <string name="cancel">Annuler</string>
+    <string name="continuee">Continuer</string>
+    <string name="redirection">Vous allez être redirigés vers le site de la cafetéria</string>
+    <string name="leaving_app">Vous êtes sur le point de quitter l\'app</string>
+
+</resources>
