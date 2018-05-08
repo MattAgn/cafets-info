@@ -82,7 +82,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             selectedCafet = getIntent().getExtras().getParcelable("cafet");
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(selectedCafet.getCoordinates())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title(selectedCafet.getName());
             InfoWindowData info = new InfoWindowData();
             info.setId(selectedCafet.getId());

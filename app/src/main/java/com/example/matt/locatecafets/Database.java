@@ -112,9 +112,11 @@ public class Database {
             "Opistotie 2 70200 Kuopio",
             "https://www.sodexo.fi/savonia");
 
-    static private List<Cafeteria> cafetList = Arrays.asList(aura, carelia, futura, louhi, puisto, forum, metla);
+    static private List<Cafeteria> cafetList = Arrays.asList(
+            aura, carelia, futura, louhi, puisto, forum, metla,
+            savonia, hilima, musiikkikeskuksen, kaarre, mediteknia, round, bistro, canthia, snellmania, tietoteknia);
 
-    static private List<Integer> distanceValues = Arrays.asList(-1, 100, 250, 500, 1000);
+    static private List<Integer> distanceValues = Arrays.asList(30000, 100, 250, 500, 1000);
 
     static public List<Cafeteria> getCafeterias() { return cafetList;}
 

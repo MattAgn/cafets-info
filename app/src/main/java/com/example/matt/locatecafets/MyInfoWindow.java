@@ -52,7 +52,11 @@ public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
         addressView.setText(infoWindowData.getAddress());
 
         ImageView image = view.findViewById(R.id.image_view);
-        image.setImageResource(idImages[infoWindowData.getId()]);
+        try {
+            image.setImageResource(idImages[infoWindowData.getId()]);
+        } catch (java.lang.ArrayIndexOutOfBoundsException exception){
+            Log.d("Info Window", "no image");
+        }
 
 
 
