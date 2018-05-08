@@ -28,7 +28,17 @@ public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
             R.drawable.louhi,
             R.drawable.puisto,
             R.drawable.forum,
-            R.drawable.melta
+            R.drawable.melta,
+            R.drawable.round,
+            R.drawable.bistro,
+            R.drawable.tietoteknia,
+            R.drawable.snellmania,
+            R.drawable.canthia,
+            R.drawable.mediteknia,
+            R.drawable.kaarre,
+            R.drawable.musiikkikeskuksen,
+            R.drawable.hilima,
+            R.drawable.savonia,
     };
 
     public MyInfoWindow(Context ctx){
@@ -53,6 +63,7 @@ public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         ImageView image = view.findViewById(R.id.image_view);
         image.setImageResource(idImages[infoWindowData.getId()]);
+
 
 
 

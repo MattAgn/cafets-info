@@ -2,8 +2,11 @@ package com.example.matt.locatecafets;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +14,8 @@ import android.location.LocationManager;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -26,6 +31,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -38,10 +55,10 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ListActivity extends Activity {
-
     private List<Integer> distanceValues = Database.getDistanceValues();
-    private int maxDistance = -1; //means default value is infinity
+    private int maxDistance = 30000; //means default value is city size
     private List<Cafeteria> cafetList = Database.getCafeterias();
+    private GoogleApiClient googleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +78,9 @@ public class ListActivity extends Activity {
 
         refreshButton.setOnClickListener(refreshClickListener);
 
+        showSettingsAlert();
         handleLocation();
+
     }
 
     //Helper functions
@@ -95,7 +114,7 @@ public class ListActivity extends Activity {
         for (int i = 0; i < cafetList.size(); i++) {
             final Cafeteria cafet = cafetList.get(i);
             int distance = cafet.getDistanceToMe();
-            if ( distance < maxDistance || maxDistance == -1) {
+            if ( distance < maxDistance ) {
                 String text = String.valueOf(i + 1) + ". " + cafet.getName() + " - ";
                 if (distance < 1000) {
                     text += String.valueOf(distance) + "m";
@@ -121,16 +140,14 @@ public class ListActivity extends Activity {
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setData(Uri.parse(cafet.getWebsite()));
-                                startActivity(intent);
+                                showLeavingAppAlert(cafet);
                             }
                         }
                 );
             }
             if (resultContainer.getChildCount() == 0) {
                 TextView textView = new TextView(this);
-                textView.setText("No cafeteria found in this range");
+                textView.setText(R.string.no_cafet);
                 resultContainer.addView(textView);
             }
         }
@@ -147,21 +164,18 @@ public class ListActivity extends Activity {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-            if (myLocation != null) {
-                updateOrderList(myLocation);
-                updateInterface();
-            } else {
-                Toast.makeText(this, "Please activate your GPS", Toast.LENGTH_LONG).show();
-            }
-
-            // Ask the user to activate GPS
+            // Ask the user to activate GPS if not done
             if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                Intent intent = new Intent( android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS) ;
-                startActivityForResult(intent, 1);
+                //showSettingsAlert();
+            } else {
+                if (myLocation != null) {
+                    updateOrderList(myLocation);
+                    updateInterface();
+                } else {
+                    Toast.makeText(this, "Waiting for GPS position", Toast.LENGTH_LONG).show();
+                }
             }
-
         }
-
     }
 
     //Listeners
@@ -186,16 +200,14 @@ public class ListActivity extends Activity {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
 
-                Toast.makeText(getApplicationContext(), "Please activate your GPS", Toast.LENGTH_LONG).show();
-
+                //Toast.makeText(getApplicationContext(), "Please activate your GPS", Toast.LENGTH_LONG).show();
                 // Ask the user to activate GPS
                 LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
                 if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                    Intent intent = new Intent( android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS) ;
-                    startActivityForResult(intent, 1);
+                    showSettingsAlert();
                 }
-
-            }        }
+            }
+        }
     };
 
     View.OnClickListener refreshClickListener = new View.OnClickListener() {
@@ -218,4 +230,67 @@ public class ListActivity extends Activity {
         @Override
         public void onNothingSelected(AdapterView<?> parent) {}
     };
+
+
+    public void showLeavingAppAlert(Cafeteria cafet){
+        final Cafeteria cafeteria = cafet;
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+        alertDialog.setTitle("You're about to leave the app");
+        alertDialog.setMessage("You're going to be redirected to the website of the cafeteria, do you want to continue ?");
+
+        alertDialog.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int which) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(cafeteria.getWebsite()));
+                startActivity(intent);
+            }
+        });
+
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        alertDialog.show();
+    }
+
+    public void showSettingsAlert() {
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                    .addApi(LocationServices.API)
+                    .build();
+            googleApiClient.connect();
+
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); locationRequest.setInterval(30 * 1000);
+            locationRequest.setFastestInterval(5 * 1000);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+            builder.setAlwaysShow(true); // this is the key ingredient
+            PendingResult result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+            result.setResultCallback(new ResultCallback() {
+                @Override
+                public void onResult(Result result){
+                    final Status status = result.getStatus();
+                    final LocationSettingsStates state = ((LocationSettingsResult)result).getLocationSettingsStates();
+                    switch (status.getStatusCode())
+                    {
+                        case LocationSettingsStatusCodes.SUCCESS:
+                            break;
+
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                status.startResolutionForResult(ListActivity.this, 1000);
+                            } catch (IntentSender.SendIntentException e) {}
+                            break;
+
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            break;
+                    }
+                }
+            });
+            googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
+        }
+    }
 }

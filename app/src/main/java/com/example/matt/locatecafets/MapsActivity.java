@@ -2,6 +2,7 @@ package com.example.matt.locatecafets;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +20,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,6 +51,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private List<Cafeteria> cafetList = Database.getCafeterias();
     private Cafeteria selectedCafet;
+    private GoogleApiClient googleApiClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +87,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Location myLocation = getLocation();
         displaySelectedCafet();
         displayMarkers(myLocation);
+
+        showSettingsAlert();
     }
 
 
@@ -82,15 +98,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             selectedCafet = getIntent().getExtras().getParcelable("cafet");
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(selectedCafet.getCoordinates())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title(selectedCafet.getName());
             InfoWindowData info = new InfoWindowData();
             info.setId(selectedCafet.getId());
             info.setAddress(selectedCafet.getAddress());
             Marker m = mMap.addMarker(markerOptions);
             m.setTag(info);
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(selectedCafet.getCoordinates()));
             m.showInfoWindow();
+            int zoom = (int)mMap.getCameraPosition().zoom;
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(selectedCafet.getCoordinates().latitude + (double)90/Math.pow(2, zoom),
+                            selectedCafet.getCoordinates().longitude), zoom));
         }
     }
 
@@ -104,12 +122,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-            // We force the user to give his GPS location
-            /*
-            if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                Intent intent = new Intent( android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS) ;
-                startActivityForResult(intent, 1);
-            }*/
 
             // We move the camera on user if possible
             if (myLocation != null && selectedCafet == null) {
@@ -220,11 +232,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 marker.hideInfoWindow();
             } else {
                 marker.showInfoWindow();
+                int zoom = (int)mMap.getCameraPosition().zoom;
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(marker.getPosition().latitude + (double)90/Math.pow(2, zoom),
+                                marker.getPosition().longitude), zoom), 500, null);
             }
             return true;
         }
     };
 
+    //
 
     // Menu for different views of the map
     @Override
@@ -248,5 +265,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void getListView(MenuItem item) {
         Intent intent = new Intent(MapsActivity.this, ListActivity.class);
         startActivity(intent);
+    }
+
+    public void showSettingsAlert() {
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                    .addApi(LocationServices.API)
+                    .build();
+            googleApiClient.connect();
+
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); locationRequest.setInterval(30 * 1000);
+            locationRequest.setFastestInterval(5 * 1000);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+            builder.setAlwaysShow(true); // this is the key ingredient
+            PendingResult result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+            result.setResultCallback(new ResultCallback() {
+                @Override
+                public void onResult(Result result){
+                    final Status status = result.getStatus();
+                    final LocationSettingsStates state = ((LocationSettingsResult)result).getLocationSettingsStates();
+                    switch (status.getStatusCode())
+                    {
+                        case LocationSettingsStatusCodes.SUCCESS:
+                            break;
+
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                status.startResolutionForResult(MapsActivity.this, 1000);
+                            } catch (IntentSender.SendIntentException e) {}
+                            break;
+
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            break;
+                    }
+                }
+            });
+            googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
+        }
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="display_range">
-        <item>Display all cafeterias</item>
+        <item>All cafeterias in your city</item>
         <item>In range &lt;100m</item>
         <item>In range &lt;250m</item>
         <item>In range &lt;500m</item>
