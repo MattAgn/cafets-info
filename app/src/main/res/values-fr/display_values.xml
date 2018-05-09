@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="display_range">
+        <item>Toutes les cafetérias de la ville</item>
+        <item>Dans un rayon de 100m</item>
+        <item>Dans un rayon de 250m</item>
+        <item>Dans un rayon de 500m</item>
+        <item>Dans un rayon de 1000m</item>
+    </string-array>
+</resources>

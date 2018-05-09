@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Cafet\'info</string>
+    <string name="title_activity_maps">Kartta</string>
+    <string name="view_maps">Karttojen näkymä</string>
+    <string name="get_cafeterias">Listanäkymä</string>
+    <string name="see_location">Katso sijainti</string>
+    <string name="see_website">Katso verkkosivu</string>
+    <string name="normal_view">Normaali karttanäkymä</string>
+    <string name="hybrid_view">Hybridi-karttanäkymä</string>
+    <string name="satellite_view">Satelliittikartanäkymä</string>
+    <string name="list_view">Katso luettelo</string>
+    <string name="display_cafeterias">Näytä kaikki</string>
+    <string name="refresh">virkistää</string>
+    <string name="opening_hours">Aukioloajat :</string>
+    <string name="address">Osoite :</string>
+    <string name="image_description">kuva ravintolasta</string>
+    <string name="activate_gps">To fully use the app, don\'t forget to turn your GPS on</string>
+    <string name="no_cafet">Ei ole kahvilaa tällä alueella</string>
+    <string name="waiting_gps">Odotetaan GPS: tä</string>
+    <string name="closest">(lähin)</string>
+    <string name="cancel">Peruuttaa</string>
+    <string name="continuee">Jatkaa</string>
+    <string name="redirection">Sinut ohjataan uudelleen kahvilan verkkosivustolle</string>
+    <string name="leaving_app">Olet poistumassa sovelluksesta</string>
+
+</resources>

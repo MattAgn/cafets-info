@@ -1,6 +1,5 @@
 package com.example.matt.locatecafets;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,18 +10,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -31,7 +25,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Result;
@@ -43,13 +36,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -78,9 +65,8 @@ public class ListActivity extends Activity {
 
         refreshButton.setOnClickListener(refreshClickListener);
 
-        showSettingsAlert();
+        showSettingsAlert(false);
         handleLocation();
-
     }
 
     //Helper functions
@@ -172,7 +158,7 @@ public class ListActivity extends Activity {
                     updateOrderList(myLocation);
                     updateInterface();
                 } else {
-                    Toast.makeText(this, "Waiting for GPS position", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.waiting_gps, Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -187,7 +173,7 @@ public class ListActivity extends Activity {
 
         @Override
         public void onProviderEnabled(String provider) {
-            if (provider == LocationManager.GPS_PROVIDER) {
+            if (provider.equals(LocationManager.GPS_PROVIDER)) {
                 handleLocation();
             }
         }
@@ -197,16 +183,7 @@ public class ListActivity extends Activity {
 
         @Override
         public void onProviderDisabled(String provider) {
-            if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
-
-                //Toast.makeText(getApplicationContext(), "Please activate your GPS", Toast.LENGTH_LONG).show();
-                // Ask the user to activate GPS
-                LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-                if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                    showSettingsAlert();
-                }
-            }
+            showSettingsAlert((provider.equals("gps")));
         }
     };
 
@@ -236,10 +213,10 @@ public class ListActivity extends Activity {
         final Cafeteria cafeteria = cafet;
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 
-        alertDialog.setTitle("You're about to leave the app");
-        alertDialog.setMessage("You're going to be redirected to the website of the cafeteria, do you want to continue ?");
+        alertDialog.setTitle(R.string.leaving_app);
+        alertDialog.setMessage(R.string.redirection);
 
-        alertDialog.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton(R.string.continuee, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog,int which) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(cafeteria.getWebsite()));
@@ -247,7 +224,7 @@ public class ListActivity extends Activity {
             }
         });
 
-        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alertDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
@@ -255,8 +232,9 @@ public class ListActivity extends Activity {
         alertDialog.show();
     }
 
-    public void showSettingsAlert() {
-        if (googleApiClient == null) {
+    // TODO:  to try out
+    public void showSettingsAlert(boolean shouldAppear) {
+        if (googleApiClient == null || shouldAppear) {
             googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(LocationServices.API)
                     .build();

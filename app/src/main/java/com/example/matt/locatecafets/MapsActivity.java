@@ -1,6 +1,8 @@
 package com.example.matt.locatecafets;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -12,12 +14,15 @@ import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,6 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<Cafeteria> cafetList = Database.getCafeterias();
     private Cafeteria selectedCafet;
     private GoogleApiClient googleApiClient;
+    private String websiteCafetClicked;
+    private Button websiteButton;
 
 
     @Override
@@ -62,6 +69,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        showSettingsAlert(true);
+        websiteButton = findViewById(R.id.website_map_button);
+
+        websiteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (websiteCafetClicked != null) {
+                    showLeavingAppAlert(websiteCafetClicked);
+                }
+            }
+        });
     }
 
     @Override
@@ -82,13 +100,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MyInfoWindow myInfoWindow = new MyInfoWindow(this);
         mMap.setInfoWindowAdapter(myInfoWindow);
         mMap.setOnMarkerClickListener(markerClickListener);
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                websiteButton.setVisibility(View.INVISIBLE);
+            }
+        });
 
         // Displays different markers
         Location myLocation = getLocation();
         displaySelectedCafet();
         displayMarkers(myLocation);
-
-        showSettingsAlert();
     }
 
 
@@ -102,9 +124,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             InfoWindowData info = new InfoWindowData();
             info.setId(selectedCafet.getId());
             info.setAddress(selectedCafet.getAddress());
+            info.setWebsite(selectedCafet.getWebsite());
             Marker m = mMap.addMarker(markerOptions);
             m.setTag(info);
             m.showInfoWindow();
+            websiteCafetClicked = selectedCafet.getWebsite();
+            websiteButton.setVisibility(View.VISIBLE);
             int zoom = (int)mMap.getCameraPosition().zoom;
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(selectedCafet.getCoordinates().latitude + (double)90/Math.pow(2, zoom),
@@ -135,7 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (myLocation != null) {
                 updateOrderList(myLocation);
             } else {
-                Toast.makeText(this, "Position not found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.waiting_gps, Toast.LENGTH_SHORT).show();
             }
             return myLocation;
         }
@@ -153,12 +178,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //closest cafet is not in the same color
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(cafet.getCoordinates())
-                        .title(cafetList.get(i).getName() + " (closest)")
+                        .title(cafetList.get(i).getName() + getString(R.string.closest))
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                         .snippet("Closest to you");
                 InfoWindowData info = new InfoWindowData();
                 info.setId(cafet.getId());
                 info.setAddress(cafet.getAddress());
+                info.setWebsite(cafet.getWebsite());
                 Marker m = mMap.addMarker(markerOptions);
                 m.setTag(info);
             } else if (selectedCafet == null || selectedCafet.getId() != cafet.getId()) {
@@ -169,6 +195,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 InfoWindowData info = new InfoWindowData();
                 info.setId(cafet.getId());
                 info.setAddress(cafet.getAddress());
+                info.setWebsite(cafet.getWebsite());
                 Marker m = mMap.addMarker(markerOptions);
                 m.setTag(info);
             }
@@ -204,25 +231,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // If GPS is activated or disactivated, we update the markers
-            //TODO: not really working when GPS disabled
-            Log.d("Status change", String.valueOf(status));
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+        @Override
+        public void onProviderEnabled(String provider) {
             Location myLocation = getLocation();
             mMap.clear();
             if (selectedCafet != null) {
                 displaySelectedCafet();
             }
             displayMarkers(myLocation);
-            //TODO: weird, if condition below not working when GPS desactivated
-            //if (provider == LocationManager.GPS_PROVIDER) {
         }
 
         @Override
-        public void onProviderEnabled(String provider) {}
-
-        @Override
-        public void onProviderDisabled(String provider) {}
+        public void onProviderDisabled(String provider) {
+            showSettingsAlert((provider.equals("gps")));
+        }
     };
 
     GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
@@ -235,7 +259,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 int zoom = (int)mMap.getCameraPosition().zoom;
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(marker.getPosition().latitude + (double)90/Math.pow(2, zoom),
-                                marker.getPosition().longitude), zoom), 500, null);
+                                marker.getPosition().longitude), zoom), 400, null);
+                websiteButton.setVisibility(View.VISIBLE);
+                InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
+                websiteCafetClicked = infoWindowData.getWebsite();
             }
             return true;
         }
@@ -254,10 +281,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
-    public void getHybridView(MenuItem item){
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-    }
-
     public void getSatelliteView(MenuItem item){
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
     }
@@ -267,8 +290,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(intent);
     }
 
-    public void showSettingsAlert() {
-        if (googleApiClient == null) {
+    public void showLeavingAppAlert(String website){
+        final String websiteFinal = website;
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+        alertDialog.setTitle(R.string.leaving_app);
+        alertDialog.setMessage(R.string.redirection);
+
+        alertDialog.setPositiveButton(R.string.continuee, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int which) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(websiteFinal));
+                startActivity(intent);
+            }
+        });
+
+        alertDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        alertDialog.show();
+    }
+
+    public void showSettingsAlert(boolean shouldAppear) {
+        if (googleApiClient == null || shouldAppear) {
             googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(LocationServices.API)
                     .build();
