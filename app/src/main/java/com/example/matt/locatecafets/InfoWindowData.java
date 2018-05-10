@@ -1,10 +1,5 @@
 package com.example.matt.locatecafets;
 
-/**
- * Created by matt on 10/04/18.
- */
-
-
 public class InfoWindowData {
 
     private String openingHours;
