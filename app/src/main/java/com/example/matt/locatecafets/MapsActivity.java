@@ -1,11 +1,15 @@
 package com.example.matt.locatecafets;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,19 +64,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient googleApiClient;
     private String websiteCafetClicked;
     private Button websiteButton;
+    private int buttonSlideValue;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        showSettingsAlert(true);
         websiteButton = findViewById(R.id.website_map_button);
-
         websiteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,22 +97,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
         }
 
+        //Setting the website button slide value
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
+        buttonSlideValue = width_px/2 - websiteButton.getWidth()/2;
+
         // Creates the buttons for zoom and compass
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         MyInfoWindow myInfoWindow = new MyInfoWindow(this);
         mMap.setInfoWindowAdapter(myInfoWindow);
         mMap.setOnMarkerClickListener(markerClickListener);
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                websiteButton.setVisibility(View.INVISIBLE);
-            }
-        });
+        mMap.setOnMapClickListener(mapClickListener);
+        mMap.setOnMapLoadedCallback(mapLoadedCallback);
 
-        // Displays different markers
         Location myLocation = getLocation();
-        displaySelectedCafet();
         displayMarkers(myLocation);
     }
 
@@ -129,11 +132,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             m.setTag(info);
             m.showInfoWindow();
             websiteCafetClicked = selectedCafet.getWebsite();
-            websiteButton.setVisibility(View.VISIBLE);
             int zoom = (int)mMap.getCameraPosition().zoom;
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(selectedCafet.getCoordinates().latitude + (double)90/Math.pow(2, zoom),
                             selectedCafet.getCoordinates().longitude), zoom));
+            animateWebsiteButton();
         }
     }
 
@@ -191,7 +194,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(cafetList.get(i).getCoordinates())
                         .title(cafetList.get(i).getName());
-                Log.d("cafet", String.valueOf(cafet.getId()));
                 InfoWindowData info = new InfoWindowData();
                 info.setId(cafet.getId());
                 info.setAddress(cafet.getAddress());
@@ -216,6 +218,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // Listeners
+    GoogleMap.OnMapLoadedCallback mapLoadedCallback = new GoogleMap.OnMapLoadedCallback() {
+        @Override
+        public void onMapLoaded() {
+            displaySelectedCafet();
+        }
+    };
+
+    GoogleMap.OnMapClickListener mapClickListener = new GoogleMap.OnMapClickListener() {
+        @Override
+        public void onMapClick(LatLng latLng) {
+            if (websiteButton.getVisibility() == View.VISIBLE) {
+                websiteButton.animate()
+                        .translationX(-buttonSlideValue)
+                        .alpha(0.0f)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                websiteButton.setVisibility(View.INVISIBLE);
+                            }
+                        });
+            }
+        }
+    };
+
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
@@ -260,15 +287,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(marker.getPosition().latitude + (double)90/Math.pow(2, zoom),
                                 marker.getPosition().longitude), zoom), 400, null);
-                websiteButton.setVisibility(View.VISIBLE);
                 InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
                 websiteCafetClicked = infoWindowData.getWebsite();
+                animateWebsiteButton();
             }
             return true;
         }
     };
-
-    //
 
     // Menu for different views of the map
     @Override
@@ -350,5 +375,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
             googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
         }
+    }
+
+    public void animateWebsiteButton() {
+        // Prepare the View for the animation
+        websiteButton.setVisibility(View.VISIBLE);
+        websiteButton.setAlpha(0.0f);
+
+        // Start the animation
+        websiteButton.animate()
+                .translationX(buttonSlideValue)
+                .alpha(1.0f)
+                .setListener(null);
     }
 }

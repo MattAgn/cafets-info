@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -52,7 +53,6 @@ public class ListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        ImageButton refreshButton = findViewById(R.id.refresh_image_button);
         Spinner displaySpinner = findViewById(R.id.spinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -63,9 +63,6 @@ public class ListActivity extends Activity {
         displaySpinner.setAdapter(adapter);
         displaySpinner.setOnItemSelectedListener(spinnerListener);
 
-        refreshButton.setOnClickListener(refreshClickListener);
-
-        showSettingsAlert(false);
         handleLocation();
     }
 
@@ -87,7 +84,10 @@ public class ListActivity extends Activity {
         ViewGroup wrapper = findViewById(R.id.wrapper);
         LinearLayout resultContainer = new LinearLayout(this);
         resultContainer.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        params.setMargins(15, 0, 15, 0);
         resultContainer.setLayoutParams(params);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         int childCount = wrapper.getChildCount();
@@ -101,17 +101,30 @@ public class ListActivity extends Activity {
             final Cafeteria cafet = cafetList.get(i);
             int distance = cafet.getDistanceToMe();
             if ( distance < maxDistance ) {
-                String text = String.valueOf(i + 1) + ". " + cafet.getName() + " - ";
+                String distanceString;
                 if (distance < 1000) {
-                    text += String.valueOf(distance) + "m";
+                    distanceString = String.valueOf(distance) + "m";
                 } else {
-                    text += String.valueOf(Math.floor(distance / 100)/10 ) + "km";
+                    distanceString = String.valueOf(Math.floor(distance / 100)/10 ) + "km";
                 }
                 View result = inflater.inflate(R.layout.result_item, null);
+                LinearLayout.LayoutParams resultParams = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                resultParams.setMargins(20, 25, 20, 25);
+                result.setLayoutParams(resultParams);
+                //result.setElevation(5);
                 TextView resultText = (TextView) ((ViewGroup) result).getChildAt(0);
-                resultText.setText(text);
+                TextView distanceText = (TextView) ((ViewGroup) result).getChildAt(1);
+                ImageButton websiteButton = (ImageButton) ((ViewGroup) result).getChildAt(2);
+                ImageButton mapButton = (ImageButton) ((ViewGroup) result).getChildAt(3);
+                resultText.setText(cafet.getName());
+                distanceText.setText(distanceString);
                 resultContainer.addView(result);
-                ((ViewGroup) result).getChildAt(2).setOnClickListener(
+
+                websiteButton.setElevation(3);
+                mapButton.setElevation(3);
+                mapButton.setOnClickListener(
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -121,8 +134,7 @@ public class ListActivity extends Activity {
                             }
                         }
                 );
-                // TODO: include warning message, about to leave app
-                ((ViewGroup) result).getChildAt(1).setOnClickListener(
+                websiteButton.setOnClickListener(
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -147,13 +159,11 @@ public class ListActivity extends Activity {
 
             // Getting Current Location
             LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
             // Ask the user to activate GPS if not done
-            if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                //showSettingsAlert();
-            } else {
+            if ( locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
                 if (myLocation != null) {
                     updateOrderList(myLocation);
                     updateInterface();
@@ -164,7 +174,9 @@ public class ListActivity extends Activity {
         }
     }
 
-    //Listeners
+    /***************
+     ** LISTENERS **
+     **************/
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
@@ -187,13 +199,6 @@ public class ListActivity extends Activity {
         }
     };
 
-    View.OnClickListener refreshClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            handleLocation();
-        }
-    };
-
     AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -209,6 +214,9 @@ public class ListActivity extends Activity {
     };
 
 
+    /*************
+    ** ALERTS **
+    ***********/
     public void showLeavingAppAlert(Cafeteria cafet){
         final Cafeteria cafeteria = cafet;
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
