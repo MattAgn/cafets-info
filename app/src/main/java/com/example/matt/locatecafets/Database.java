@@ -113,7 +113,7 @@ public class Database {
             "https://www.sodexo.fi/savonia");
 
     static private List<Cafeteria> cafetList = Arrays.asList(
-            aura, carelia, futura, louhi, puisto, forum, metla,
+            aura, carelia, futura,louhi, puisto, forum, metla,
             savonia, hilima, musiikkikeskuksen, kaarre, mediteknia, round, bistro, canthia, snellmania, tietoteknia);
 
     static private List<Integer> distanceValues = Arrays.asList(30000, 100, 250, 500, 1000);
