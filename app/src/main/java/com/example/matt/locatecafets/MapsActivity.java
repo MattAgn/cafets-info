@@ -163,7 +163,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // We sort the list by distance to user
             if (myLocation != null) {
                 updateOrderList(myLocation);
-            } else {
+            } else if (googleApiClient != null){
                 Toast.makeText(this, R.string.waiting_gps, Toast.LENGTH_SHORT).show();
             }
             return myLocation;
@@ -254,6 +254,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
                 mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                if (websiteButton.getVisibility() == View.VISIBLE) {
+                    websiteButton.animate()
+                            .translationX(-buttonSlideValue)
+                            .alpha(0.0f)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                    websiteButton.setVisibility(View.INVISIBLE);
+                                }
+                            });
+                }
             } else {
                 displaySelectedCafet();
             }

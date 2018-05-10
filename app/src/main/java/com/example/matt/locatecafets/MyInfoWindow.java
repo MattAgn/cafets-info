@@ -46,12 +46,12 @@ public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
     }
 
     @Override
-    public View getInfoWindow(Marker marker) {
+    public View getInfoContents(Marker marker) {
         return null;
     }
 
     @Override
-    public View getInfoContents(Marker marker) {
+    public View getInfoWindow(Marker marker) {
         View view = ((Activity)context).getLayoutInflater().inflate(R.layout.info_window, null);
         final InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
 

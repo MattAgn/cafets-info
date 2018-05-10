@@ -1,10 +1,11 @@
 package com.example.matt.locatecafets;
 
 
+import android.content.res.Resources;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 
 
 public class Database {
