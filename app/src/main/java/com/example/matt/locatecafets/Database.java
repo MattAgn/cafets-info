@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static android.provider.Settings.Global.getString;
 
 
 public class Database {

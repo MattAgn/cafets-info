@@ -33,6 +33,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="10dp"
+        android:tint="@color/colorAccent"
         android:layout_gravity="center_vertical"
         android:backgroundTint="@color/colorSecondary"
         android:src="@drawable/ic_info_outline_black_24dp"
@@ -43,6 +44,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="center_vertical"
+        android:tint="@color/colorAccent"
         android:backgroundTint="@color/colorSecondary"
         android:src="@drawable/ic_location_on_black_18dp"
         android:contentDescription="@string/see_location"/>

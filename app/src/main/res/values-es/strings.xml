@@ -26,4 +26,5 @@
     <string name="mon_fri">Lun-Vie</string>
     <string name="fri">Vie</string>
     <string name="not_available">No disponible</string>
+    <string name="logo">logo</string>
 </resources>

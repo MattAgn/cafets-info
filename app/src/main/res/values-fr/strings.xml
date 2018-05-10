@@ -26,4 +26,5 @@
     <string name="mon_fri">Lun-Ven</string>
     <string name="fri">Ven</string>
     <string name="not_available">Non disponible</string>
+    <string name="logo">logo</string>
 </resources>

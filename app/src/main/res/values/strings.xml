@@ -27,5 +27,6 @@
     <string name="mon_fri">Mon-Fri</string>
     <string name="fri">Fri</string>
     <string name="not_available">Not available</string>
+    <string name="logo">logo</string>
 
 </resources>
