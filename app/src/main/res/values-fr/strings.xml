@@ -22,5 +22,8 @@
     <string name="continuee">Continuer</string>
     <string name="redirection">Vous allez être redirigés vers le site de la cafetéria</string>
     <string name="leaving_app">Vous êtes sur le point de quitter l\'app</string>
-
+    <string name="mon_thu">Lun-Jeu</string>
+    <string name="mon_fri">Lun-Ven</string>
+    <string name="fri">Ven</string>
+    <string name="not_available">Non disponible</string>
 </resources>

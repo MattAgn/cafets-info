@@ -22,10 +22,11 @@ public class Cafeteria implements Parcelable {
     private String website; //todo : change to URI&
     private String address;
     private Location location;
+    private String openingHours;
     private int distanceToMe; //not clean
 
     //Constructors
-    public Cafeteria(String name, double latitude, double longitude, String address, String website){
+    public Cafeteria(String name, double latitude, double longitude, String address, String website, String openingHours){
         this.id = lastId + 1;
         lastId ++;
         this.name = name;
@@ -35,6 +36,7 @@ public class Cafeteria implements Parcelable {
         location.setLongitude(longitude);
         location.setLatitude(latitude);
         this.website = website;
+        this.openingHours = openingHours;
     }
 
     protected Cafeteria(Parcel in) {
@@ -46,6 +48,7 @@ public class Cafeteria implements Parcelable {
         address = in.readString();
         location = in.readParcelable(Location.class.getClassLoader());
         distanceToMe = in.readInt();
+        openingHours = in.readString();
     }
 
     public static final Creator<Cafeteria> CREATOR = new Creator<Cafeteria>() {
@@ -85,6 +88,8 @@ public class Cafeteria implements Parcelable {
 
     public String getWebsite() { return website; }
 
+    public String getOpeningHours() { return openingHours; }
+
     public int getDistanceToMe() {
         return distanceToMe;
     }
@@ -106,6 +111,7 @@ public class Cafeteria implements Parcelable {
         dest.writeParcelable(coordinates, flags);
         dest.writeString(website);
         dest.writeString(address);
+        dest.writeString(openingHours);
         dest.writeParcelable(location, flags);
         dest.writeInt(distanceToMe);
     }

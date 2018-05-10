@@ -61,6 +61,9 @@ public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
         TextView addressView = view.findViewById(R.id.address_view);
         addressView.setText(infoWindowData.getAddress());
 
+        TextView openingHoursView = view.findViewById(R.id.opening_hours_view);
+        openingHoursView.setText(infoWindowData.getOpeningHours());
+
         ImageView image = view.findViewById(R.id.image_view);
         image.setImageResource(idImages[infoWindowData.getId()]);
 

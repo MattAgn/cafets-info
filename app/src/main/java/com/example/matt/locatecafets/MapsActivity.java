@@ -128,6 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             info.setId(selectedCafet.getId());
             info.setAddress(selectedCafet.getAddress());
             info.setWebsite(selectedCafet.getWebsite());
+            info.setOpeningHours(selectedCafet.getOpeningHours());
             Marker m = mMap.addMarker(markerOptions);
             m.setTag(info);
             m.showInfoWindow();
@@ -188,6 +189,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 info.setId(cafet.getId());
                 info.setAddress(cafet.getAddress());
                 info.setWebsite(cafet.getWebsite());
+                info.setOpeningHours(cafet.getOpeningHours());
                 Marker m = mMap.addMarker(markerOptions);
                 m.setTag(info);
             } else if (selectedCafet == null || selectedCafet.getId() != cafet.getId()) {
@@ -198,6 +200,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 info.setId(cafet.getId());
                 info.setAddress(cafet.getAddress());
                 info.setWebsite(cafet.getWebsite());
+                info.setOpeningHours(cafet.getOpeningHours());
                 Marker m = mMap.addMarker(markerOptions);
                 m.setTag(info);
             }

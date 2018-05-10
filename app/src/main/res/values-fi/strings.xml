@@ -22,5 +22,7 @@
     <string name="continuee">Jatkaa</string>
     <string name="redirection">Sinut ohjataan uudelleen kahvilan verkkosivustolle</string>
     <string name="leaving_app">Olet poistumassa sovelluksesta</string>
-
+    <string name="mon_thu">Ma-To</string>
+    <string name="fri">Pe</string>
+    <string name="not_available">ei saatavilla</string>
 </resources>

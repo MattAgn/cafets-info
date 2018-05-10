@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="display_range">
+        <item>Todas las cafeterías en tu ciudad</item>
+        <item>En el rango &lt;100m</item>
+        <item>En el rango &lt;250m</item>
+        <item>En el rango &lt;500m</item>
+        <item>En el rango &lt;1000m</item>
+    </string-array>
+</resources>
