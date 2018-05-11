@@ -12,6 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,7 +64,7 @@ public class ListActivity extends Activity {
         displaySpinner.setAdapter(adapter);
         displaySpinner.setOnItemSelectedListener(spinnerListener);
 
-        handleLocation();
+        handleLocation(false);
     }
 
     //Helper functions
@@ -87,7 +88,7 @@ public class ListActivity extends Activity {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
-        params.setMargins(15, 0, 15, 0);
+        params.setMargins(15, 0, 15, 10);
         resultContainer.setLayoutParams(params);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         int childCount = wrapper.getChildCount();
@@ -153,7 +154,7 @@ public class ListActivity extends Activity {
     }
 
     // Main function
-    public void handleLocation() {
+    public void handleLocation(boolean shouldShowWaitingMessage) {
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
 
@@ -167,8 +168,13 @@ public class ListActivity extends Activity {
                 if (myLocation != null) {
                     updateOrderList(myLocation);
                     updateInterface();
-                } else if (googleApiClient != null){
-                    Toast.makeText(this, R.string.waiting_gps, Toast.LENGTH_LONG).show();
+                } else if (googleApiClient != null && shouldShowWaitingMessage){
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), getString(R.string.waiting_gps), Toast.LENGTH_SHORT).show();                    }
+                    }, 700);
                 }
             }
         }
@@ -179,23 +185,21 @@ public class ListActivity extends Activity {
      **************/
     LocationListener locationListener = new LocationListener() {
         @Override
-        public void onLocationChanged(Location loc) {
-            handleLocation();
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            if (provider.equals(LocationManager.GPS_PROVIDER)) {
-                handleLocation();
-            }
-        }
-
+        public void onLocationChanged(Location loc) { handleLocation(false);}
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {}
+        @Override
+        public void onProviderEnabled(String provider) { handleLocation(true);}
 
         @Override
         public void onProviderDisabled(String provider) {
-            showSettingsAlert((provider.equals("gps")));
+            final String finalProvider = provider;
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showSettingsAlert((finalProvider.equals("gps")));                  }
+            }, 1000);
         }
     };
 
@@ -205,7 +209,7 @@ public class ListActivity extends Activity {
             int newMaxDistance = distanceValues.get((int)id);
             if (maxDistance != newMaxDistance ) {
                 maxDistance = newMaxDistance;
-                handleLocation();
+                handleLocation(false);
             }
         }
 

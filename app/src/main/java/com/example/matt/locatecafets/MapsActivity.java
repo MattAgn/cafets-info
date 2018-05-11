@@ -20,6 +20,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
@@ -64,7 +65,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient googleApiClient;
     private String websiteCafetClicked;
     private Button websiteButton;
-    private boolean mapIsLoaded = true;
     private int buttonSlideValue;
 
 
@@ -159,7 +159,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (myLocation != null) {
                 updateOrderList(myLocation);
             } else if (googleApiClient != null){
-                Toast.makeText(this, R.string.waiting_gps, Toast.LENGTH_SHORT).show();
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), getString(R.string.waiting_gps), Toast.LENGTH_SHORT).show();                    }
+                }, 1000);
+
             }
             return myLocation;
         }
@@ -210,6 +216,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    public void updatePositionAndClosestMarker(Location loc) {
+        if (loc != null) {
+            Cafeteria previousClosestCafet = cafetList.get(0);
+            updateOrderList(loc);
+            Cafeteria newClosestCafet = cafetList.get(0);
+            if (previousClosestCafet != newClosestCafet) {
+                Marker previousClosestMarker = previousClosestCafet.getMarker();
+                Marker newClosestMarker = newClosestCafet.getMarker();
+                previousClosestMarker.setTitle(previousClosestCafet.getName());
+                previousClosestMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                newClosestMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                newClosestMarker.setTitle(newClosestCafet.getName() + " " + getString(R.string.closest));
+            }
+            if (selectedCafet == null) {
+                LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+                mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                hideWebsiteButton();
+            }
+        }
+    }
+
+    public Cafeteria getCafetFromMarker(Marker marker) {
+        for (Cafeteria cafet : cafetList) {
+            if (marker.equals(cafet.getMarker())) {
+                return cafet;
+            }
+        }
+        return null;
+    }
+
     /**************
      * LISTENERS *
      *************/
@@ -224,23 +261,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
-            Cafeteria previousClosestCafet = cafetList.get(0);
-            updateOrderList(loc);
-            Cafeteria newClosestCafet = cafetList.get(0);
-            if (previousClosestCafet != newClosestCafet) {
-                Marker previousClosestMarker = previousClosestCafet.getMarker();
-                Marker newClosestMarker = newClosestCafet.getMarker();
-                previousClosestMarker.setTitle(previousClosestCafet.getName());
-                previousClosestMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                newClosestMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                newClosestMarker.setTitle(newClosestCafet.getName() + " " + getString(R.string.closest));
-            }
-            if (selectedCafet == null) {
-                LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                hideWebsiteButton();
-            }
+            updatePositionAndClosestMarker(loc);
         }
 
         @Override
@@ -249,16 +270,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void onProviderEnabled(String provider) {
             Location myLocation = getLocation();
-            mMap.clear();
-            if (selectedCafet != null) {
-                displaySelectedCafet();
-            }
-            displayMarkers(myLocation);
+            updatePositionAndClosestMarker(myLocation);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            showSettingsAlert((provider.equals("gps")));
+            final String finalProvider = provider;
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showSettingsAlert((finalProvider.equals("gps")));                  }
+            }, 3000);
         }
     };
 
@@ -275,7 +298,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 marker.getPosition().longitude), zoom), 400, null);
                 InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
                 websiteCafetClicked = infoWindowData.getWebsite();
-                selectedCafet = null;
+                selectedCafet = getCafetFromMarker(marker);
                 animateWebsiteButton();
             }
             return true;
@@ -290,7 +313,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
             buttonSlideValue = width_px/2 - websiteButton.getWidth()/2;
-            
+
             displaySelectedCafet();
         }
     };
