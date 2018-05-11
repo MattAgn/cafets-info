@@ -17,7 +17,7 @@ public class Database {
             "Yliopistokatu 2 , 80100 Joensuu",
             "http://www.amica.fi/aura",
             R.string.mon_thu+" : 7.45 - 19.00\n"+R.string.fri+" : 7.45 - 16.30",
-            4.90);
+            4.10);
 
     static private Cafeteria carelia = new Cafeteria(
             "Carelia",
@@ -41,7 +41,7 @@ public class Database {
             "Länsikatu 15, 80110 Joensuu",
             "http://mehtimakiravintolat.fi/ravintola-louhi/",
             R.string.mon_fri+" : 10.00 - 15.00",
-            -1);
+            2.60);
 
     static private Cafeteria puisto = new Cafeteria(
             "Puisto",
@@ -49,7 +49,7 @@ public class Database {
             "Länsikatu 15, 80110 Joensuu",
             "http://mehtimakiravintolat.fi/ravintola-puisto/",
             R.string.mon_fri+" : 10.30 - 14.00",
-            -1);
+            9.30);
 
     static private Cafeteria forum = new Cafeteria(
             "Kahvila Forum",
@@ -57,7 +57,7 @@ public class Database {
             "Linnunlahdentie 2, 80110 Joensuu",
             "http://mehtimakiravintolat.fi/kahvila-forum/",
             R.string.mon_fri+" : 8:00 - 15:00",
-            -1);
+            7.40);
 
     static private Cafeteria metla = new Cafeteria(
             "Metla",
@@ -90,7 +90,7 @@ public class Database {
             "Savilahdentie 6 , 70210 Kuopio",
             "http://www.amica.fi/ravintolat/ravintolat-kaupungeittain/kuopio/ita-suomen-yliopistotietoteknia/\n",
             R.string.mon_fri+" : 07.45 - 14.30",
-            -1);
+            2.60);
 
     static private Cafeteria snellmania = new Cafeteria(
             "Snellmania",
@@ -98,7 +98,7 @@ public class Database {
             "Yliopistonranta 1 E , 70210 Kuopio",
             "http://www.amica.fi/ravintolat/ravintolat-kaupungeittain/kuopio/ita-suomen-yliopisto--snellmania/",
             R.string.mon_fri+" : 8.00 - 14.00",
-            -1);
+            1.88);
 
     static private Cafeteria canthia = new Cafeteria(
             "Canthia",
@@ -106,7 +106,7 @@ public class Database {
             "Yliopistonranta 1C,Bporras, 70210 Kuopio",
             "http://www.amica.fi/en/restaurants/ravintolat-kaupungeittain/kuopio/ita-suomen-yliopistocanthia/",
             R.string.mon_fri+" : 7.45 - 14.30",
-            -1);
+            1.88);
 
     static private Cafeteria mediteknia = new Cafeteria(
             "Mediteknia",
@@ -114,7 +114,7 @@ public class Database {
             "Yliopistonranta 1 B , 70210 Kuopio",
             "http://www.amica.fi/en/restaurants/ravintolat-kaupungeittain/kuopio/ita-suomen-yliopisto--mediteknia/",
             R.string.mon_thu+" :  9.00 - 14.30\n"+R.string.fri+" : 9.00 - 13.30",
-            -1);
+            1.88);
 
     static private Cafeteria kaarre = new Cafeteria(
             "Kaarre",
