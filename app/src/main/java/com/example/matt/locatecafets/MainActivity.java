@@ -30,6 +30,10 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.example.matt.locatecafets.Database.getCafeterias;
 
 //test
 // TODO: 26/03/18  
@@ -70,6 +74,23 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
 
+        // Finishing the setup of the database
+        // cause error due to getString(R.string.mon_fri) not usable in database
+        List<Cafeteria> listCafet = Database.getCafeterias();
+        for (Cafeteria cafet : listCafet) {
+            String[] cafetHoursLines = cafet.getOpeningHours().split("\n");
+            String finalOpeningHours = "";
+            for (String line : cafetHoursLines) {
+                String[] cafetHoursStringList = line.split(" ");
+                cafetHoursStringList[0] = getString(Integer.parseInt(cafetHoursStringList[0]));
+                String newLine = "";
+                for (String string : cafetHoursStringList) {
+                    newLine = newLine + string + " ";
+                }
+                finalOpeningHours += newLine + "\n";
+            }
+            cafet.setOpeningHours(finalOpeningHours);
+        }
+    }
 }

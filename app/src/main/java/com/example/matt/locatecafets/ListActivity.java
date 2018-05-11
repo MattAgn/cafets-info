@@ -167,7 +167,7 @@ public class ListActivity extends Activity {
                 if (myLocation != null) {
                     updateOrderList(myLocation);
                     updateInterface();
-                } else {
+                } else if (googleApiClient != null){
                     Toast.makeText(this, R.string.waiting_gps, Toast.LENGTH_LONG).show();
                 }
             }

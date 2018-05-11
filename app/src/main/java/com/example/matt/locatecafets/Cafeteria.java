@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 /**
  * Created by matt on 26/03/18.
@@ -23,6 +24,7 @@ public class Cafeteria implements Parcelable {
     private String address;
     private Location location;
     private String openingHours;
+    private Marker marker;
     private int distanceToMe; //not clean
 
     //Constructors
@@ -94,9 +96,17 @@ public class Cafeteria implements Parcelable {
         return distanceToMe;
     }
 
+    public Marker getMarker() { return this.marker; }
+
     public void setDistanceToMe(int distanceToMe) {
         this.distanceToMe = distanceToMe;
     }
+
+    public void setOpeningHours(String openingHours) {
+        this.openingHours = openingHours;
+    }
+
+    public void setMarker(Marker marker) { this.marker = marker; }
 
     @Override
     public int describeContents() {
@@ -111,9 +121,9 @@ public class Cafeteria implements Parcelable {
         dest.writeParcelable(coordinates, flags);
         dest.writeString(website);
         dest.writeString(address);
-        dest.writeString(openingHours);
         dest.writeParcelable(location, flags);
         dest.writeInt(distanceToMe);
+        dest.writeString(openingHours);
     }
 }
 

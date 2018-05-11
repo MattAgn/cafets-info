@@ -108,28 +108,28 @@ public class Database {
             62.898102, 27.650024,
             "KYS, rakennus 2, 1 krs., 70210 Kuopio",
             "https://www.sydanmerkki.fi/ravintolat/lounasravintola-kaarre",
-            R.string.mon_fri+" : 10.00 - 14.00");
+            R.string.mon_fri + " : 10.00 - 14.00");
 
     static private Cafeteria musiikkikeskuksen = new Cafeteria(
             "Musiikkikeskuksen",
             62.888233, 27.678886,
             "Kuopionlahdenkatu 23, 70100 Kuopio",
             "http://www.kanresta.fi/lounas/kuopio/kuopion+musiikkikeskuksen+ravintola/",
-            "Not available");
+            String.valueOf(R.string.not_available));
 
     static private Cafeteria hilima = new Cafeteria(
             "Hilima",
             62.897372, 27.646994,
             "Puijonlaaksontie 2, 70210 Kuopio",
             "https://www.sydanmerkki.fi/ravintolat/lounasravintola-hilima",
-            "Not available");
+            String.valueOf(R.string.not_available));
 
     static private Cafeteria savonia = new Cafeteria(
             "Savonia AMK",
             62.898029, 27.663021,
             "Opistotie 2 70200 Kuopio",
             "https://www.sodexo.fi/savonia",
-            "Not available");
+            String.valueOf(R.string.not_available));
 
     static private List<Cafeteria> cafetList = Arrays.asList(
             aura, carelia, futura,louhi, puisto, forum, metla,

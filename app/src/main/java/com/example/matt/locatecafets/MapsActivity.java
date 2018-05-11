@@ -64,6 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient googleApiClient;
     private String websiteCafetClicked;
     private Button websiteButton;
+    private boolean mapIsLoaded = true;
     private int buttonSlideValue;
 
 
@@ -87,8 +88,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        // TODO: 06/04/18 Animate closest marker 
-        // TODO: 25/04/18 Add button to go to closest marker ? 
         mMap = googleMap;
         mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
 
@@ -96,12 +95,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 == PackageManager.PERMISSION_GRANTED) { //Checks the permission to use Location
             mMap.setMyLocationEnabled(true);
         }
-
-        //Setting the website button slide value
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
-        buttonSlideValue = width_px/2 - websiteButton.getWidth()/2;
 
         // Creates the buttons for zoom and compass
         mMap.getUiSettings().setZoomGesturesEnabled(true);
@@ -112,31 +105,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapClickListener(mapClickListener);
         mMap.setOnMapLoadedCallback(mapLoadedCallback);
 
+        focusOnSelectedCafet();
         Location myLocation = getLocation();
         displayMarkers(myLocation);
     }
 
-
-    public void displaySelectedCafet() {
+    public void focusOnSelectedCafet() {
         if (getIntent().getExtras() != null) {
             // if the users wants to see only one the cafeterias
             selectedCafet = getIntent().getExtras().getParcelable("cafet");
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(selectedCafet.getCoordinates())
                     .title(selectedCafet.getName());
-            InfoWindowData info = new InfoWindowData();
-            info.setId(selectedCafet.getId());
-            info.setAddress(selectedCafet.getAddress());
-            info.setWebsite(selectedCafet.getWebsite());
-            info.setOpeningHours(selectedCafet.getOpeningHours());
             Marker m = mMap.addMarker(markerOptions);
+            InfoWindowData info = new InfoWindowData();
+            info.setCafeteria(selectedCafet);
             m.setTag(info);
-            m.showInfoWindow();
-            websiteCafetClicked = selectedCafet.getWebsite();
+            selectedCafet.setMarker(m);
             int zoom = (int)mMap.getCameraPosition().zoom;
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(selectedCafet.getCoordinates().latitude + (double)90/Math.pow(2, zoom),
                             selectedCafet.getCoordinates().longitude), zoom));
+    }}
+
+    public void displaySelectedCafet() {
+        if (selectedCafet != null) {
+            // if the users wants to see only one the cafeterias
+            selectedCafet.getMarker().showInfoWindow();
+            websiteCafetClicked = selectedCafet.getWebsite();
             animateWebsiteButton();
         }
     }
@@ -150,7 +146,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 600, 50, locationListener);
             Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
 
             // We move the camera on user if possible
             if (myLocation != null && selectedCafet == null) {
@@ -177,32 +172,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         for (int i = 0; i < cafetList.size(); i++) {
             Cafeteria cafet = cafetList.get(i);
-            // TODO: animate closest
             if (i == 0 && myLocation !=null && (selectedCafet == null || selectedCafet.getId() != cafet.getId())) {
                 //closest cafet is not in the same color
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(cafet.getCoordinates())
-                        .title(cafetList.get(i).getName() + getString(R.string.closest))
+                        .title(cafetList.get(i).getName() + " " + getString(R.string.closest))
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                         .snippet("Closest to you");
-                InfoWindowData info = new InfoWindowData();
-                info.setId(cafet.getId());
-                info.setAddress(cafet.getAddress());
-                info.setWebsite(cafet.getWebsite());
-                info.setOpeningHours(cafet.getOpeningHours());
                 Marker m = mMap.addMarker(markerOptions);
+                InfoWindowData info = new InfoWindowData();
+                info.setCafeteria(cafet);
                 m.setTag(info);
+                cafet.setMarker(m);
             } else if (selectedCafet == null || selectedCafet.getId() != cafet.getId()) {
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(cafetList.get(i).getCoordinates())
                         .title(cafetList.get(i).getName());
-                InfoWindowData info = new InfoWindowData();
-                info.setId(cafet.getId());
-                info.setAddress(cafet.getAddress());
-                info.setWebsite(cafet.getWebsite());
-                info.setOpeningHours(cafet.getOpeningHours());
                 Marker m = mMap.addMarker(markerOptions);
+                InfoWindowData info = new InfoWindowData();
+                info.setCafeteria(cafet);
                 m.setTag(info);
+                cafet.setMarker(m);
             }
         }
     }
@@ -220,56 +210,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    // Listeners
-    GoogleMap.OnMapLoadedCallback mapLoadedCallback = new GoogleMap.OnMapLoadedCallback() {
-        @Override
-        public void onMapLoaded() {
-            displaySelectedCafet();
-        }
-    };
-
+    /**************
+     * LISTENERS *
+     *************/
     GoogleMap.OnMapClickListener mapClickListener = new GoogleMap.OnMapClickListener() {
         @Override
         public void onMapClick(LatLng latLng) {
-            if (websiteButton.getVisibility() == View.VISIBLE) {
-                websiteButton.animate()
-                        .translationX(-buttonSlideValue)
-                        .alpha(0.0f)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                websiteButton.setVisibility(View.INVISIBLE);
-                            }
-                        });
-            }
+            hideWebsiteButton();
+            selectedCafet = null;
         }
     };
 
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
-            mMap.clear();
+            Cafeteria previousClosestCafet = cafetList.get(0);
+            updateOrderList(loc);
+            Cafeteria newClosestCafet = cafetList.get(0);
+            if (previousClosestCafet != newClosestCafet) {
+                Marker previousClosestMarker = previousClosestCafet.getMarker();
+                Marker newClosestMarker = newClosestCafet.getMarker();
+                previousClosestMarker.setTitle(previousClosestCafet.getName());
+                previousClosestMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                newClosestMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                newClosestMarker.setTitle(newClosestCafet.getName() + " " + getString(R.string.closest));
+            }
             if (selectedCafet == null) {
                 LatLng myCoordinates = new LatLng(loc.getLatitude(), loc.getLongitude());
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-                mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
-                if (websiteButton.getVisibility() == View.VISIBLE) {
-                    websiteButton.animate()
-                            .translationX(-buttonSlideValue)
-                            .alpha(0.0f)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-                                    websiteButton.setVisibility(View.INVISIBLE);
-                                }
-                            });
-                }
-            } else {
-                displaySelectedCafet();
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                hideWebsiteButton();
             }
-            displayMarkers(loc);
         }
 
         @Override
@@ -304,32 +275,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 marker.getPosition().longitude), zoom), 400, null);
                 InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
                 websiteCafetClicked = infoWindowData.getWebsite();
+                selectedCafet = null;
                 animateWebsiteButton();
             }
             return true;
         }
     };
 
-    // Menu for different views of the map
+    GoogleMap.OnMapLoadedCallback mapLoadedCallback = new GoogleMap.OnMapLoadedCallback() {
+        @Override
+        public void onMapLoaded() {
+            //Setting the website button slide value
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
+            buttonSlideValue = width_px/2 - websiteButton.getWidth()/2;
+            
+            displaySelectedCafet();
+        }
+    };
+
+
+    /*************
+     *** MENU ***
+     ***********/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_map, menu);
         return true;
     }
-
     public void getNormalView(MenuItem item){
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
-
     public void getSatelliteView(MenuItem item){
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
     }
-
     public void getListView(MenuItem item) {
         Intent intent = new Intent(MapsActivity.this, ListActivity.class);
         startActivity(intent);
     }
 
+
+
+    /*************
+     ** ALERTS **
+     ***********/
     public void showLeavingAppAlert(String website){
         final String websiteFinal = website;
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -392,6 +382,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /*************
+     *ANIMATIONS*
+     ***********/
     public void animateWebsiteButton() {
         // Prepare the View for the animation
         websiteButton.setVisibility(View.VISIBLE);
@@ -402,5 +395,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .translationX(buttonSlideValue)
                 .alpha(1.0f)
                 .setListener(null);
+    }
+
+    public void hideWebsiteButton() {
+        if (websiteButton.getVisibility() == View.VISIBLE) {
+            websiteButton.animate()
+                    .translationX(-buttonSlideValue)
+                    .alpha(0.0f)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            websiteButton.setVisibility(View.INVISIBLE);
+                        }
+                    });
+        }
     }
 }

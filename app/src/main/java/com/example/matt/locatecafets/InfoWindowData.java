@@ -6,6 +6,11 @@ public class InfoWindowData {
     private int id;
     private String address;
     private String website;
+    private Cafeteria cafeteria;
+
+    public Cafeteria getCafeteria() {return this.cafeteria;}
+
+    public void setCafeteria(Cafeteria cafeteria) { this.cafeteria = cafeteria;}
 
     public int getId() { return id;}
 

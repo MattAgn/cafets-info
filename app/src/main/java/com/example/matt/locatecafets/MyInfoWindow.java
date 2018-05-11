@@ -59,13 +59,13 @@ public class MyInfoWindow implements GoogleMap.InfoWindowAdapter {
         locationTitle.setText(marker.getTitle());
 
         TextView addressView = view.findViewById(R.id.address_view);
-        addressView.setText(infoWindowData.getAddress());
+        addressView.setText(infoWindowData.getCafeteria().getAddress());
 
         TextView openingHoursView = view.findViewById(R.id.opening_hours_view);
-        openingHoursView.setText(infoWindowData.getOpeningHours());
+        openingHoursView.setText(infoWindowData.getCafeteria().getOpeningHours());
 
         ImageView image = view.findViewById(R.id.image_view);
-        image.setImageResource(idImages[infoWindowData.getId()]);
+        image.setImageResource(idImages[infoWindowData.getCafeteria().getId()]);
 
 
 
