@@ -64,8 +64,9 @@ public class ListActivity extends Activity {
         displaySpinner.setAdapter(adapter);
         displaySpinner.setOnItemSelectedListener(spinnerListener);
 
-        handleLocation(false);
+        handleLocation(true);
     }
+
 
     //Helper functions
     public void updateOrderList(Location myLocation) {
@@ -93,7 +94,6 @@ public class ListActivity extends Activity {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         int childCount = wrapper.getChildCount();
         // Cleaning the interface
-        Log.d("childCount", String.valueOf(childCount));
         if (childCount != 0) {
             wrapper.removeViewAt(0);
         }
@@ -169,6 +169,12 @@ public class ListActivity extends Activity {
                     updateOrderList(myLocation);
                     updateInterface();
                 } else if (googleApiClient != null && shouldShowWaitingMessage){
+                    ViewGroup wrapper = findViewById(R.id.wrapper);
+                    int childCount = wrapper.getChildCount();
+                    // Cleaning the interface
+                    if (childCount != 0) {
+                        wrapper.removeViewAt(0);
+                    }
                     final Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -198,7 +204,8 @@ public class ListActivity extends Activity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    showSettingsAlert((finalProvider.equals("gps")));                  }
+                    showSettingsAlert((finalProvider.equals("gps")));
+                }
             }, 1000);
         }
     };
@@ -244,7 +251,6 @@ public class ListActivity extends Activity {
         alertDialog.show();
     }
 
-    // TODO:  to try out
     public void showSettingsAlert(boolean shouldAppear) {
         if (googleApiClient == null || shouldAppear) {
             googleApiClient = new GoogleApiClient.Builder(getApplicationContext())

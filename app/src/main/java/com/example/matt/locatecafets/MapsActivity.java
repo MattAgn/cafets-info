@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -56,6 +58,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
+import static com.example.matt.locatecafets.R.drawable.logo_final2;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -116,6 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             selectedCafet = getIntent().getExtras().getParcelable("cafet");
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(selectedCafet.getCoordinates())
+                    .icon(BitmapDescriptorFactory.fromBitmap(((BitmapDrawable)getDrawable(R.drawable.logo_final2)).getBitmap()))
                     .title(selectedCafet.getName());
             Marker m = mMap.addMarker(markerOptions);
             InfoWindowData info = new InfoWindowData();
@@ -163,7 +168,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), getString(R.string.waiting_gps), Toast.LENGTH_SHORT).show();                    }
+                        Toast.makeText(
+                                getApplicationContext(), getString(R.string.waiting_gps), Toast.LENGTH_SHORT).show();
+                    }
                 }, 1000);
 
             }
