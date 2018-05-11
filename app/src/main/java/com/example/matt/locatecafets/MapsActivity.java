@@ -120,7 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             selectedCafet = getIntent().getExtras().getParcelable("cafet");
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(selectedCafet.getCoordinates())
-                    .icon(BitmapDescriptorFactory.fromBitmap(((BitmapDrawable)getDrawable(R.drawable.logo_final2)).getBitmap()))
+                    //.icon(BitmapDescriptorFactory.fromBitmap(((BitmapDrawable)getDrawable(R.drawable.logo_final2)).getBitmap()))
                     .title(selectedCafet.getName());
             Marker m = mMap.addMarker(markerOptions);
             InfoWindowData info = new InfoWindowData();

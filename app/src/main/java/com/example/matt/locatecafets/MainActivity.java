@@ -88,7 +88,10 @@ public class MainActivity extends AppCompatActivity {
                 for (String string : cafetHoursStringList) {
                     newLine = newLine + string + " ";
                 }
-                finalOpeningHours += newLine + "\n";
+                finalOpeningHours += newLine;
+                if (cafetHoursLines.length > 1) {
+                    finalOpeningHours += "\n";
+                }
             }
             cafet.setOpeningHours(finalOpeningHours);
         }
