@@ -24,11 +24,14 @@ public class Cafeteria implements Parcelable {
     private String address;
     private Location location;
     private String openingHours;
+    private double price;
+    private String priceString;
+    final private double UNKNOWN_PRICE = -1;
     private Marker marker;
     private int distanceToMe; //not clean
 
     //Constructors
-    public Cafeteria(String name, double latitude, double longitude, String address, String website, String openingHours){
+    public Cafeteria(String name, double latitude, double longitude, String address, String website, String openingHours, double price){
         this.id = lastId + 1;
         lastId ++;
         this.name = name;
@@ -39,6 +42,13 @@ public class Cafeteria implements Parcelable {
         location.setLatitude(latitude);
         this.website = website;
         this.openingHours = openingHours;
+        this.price = price;
+        if (price == UNKNOWN_PRICE) {
+            this.priceString = "Not available";
+        }
+        else {
+            this.priceString = String.valueOf(price) + "€";
+        }
     }
 
     protected Cafeteria(Parcel in) {
@@ -51,6 +61,8 @@ public class Cafeteria implements Parcelable {
         location = in.readParcelable(Location.class.getClassLoader());
         distanceToMe = in.readInt();
         openingHours = in.readString();
+        price = in.readDouble();
+        priceString = in.readString();
     }
 
     public static final Creator<Cafeteria> CREATOR = new Creator<Cafeteria>() {
@@ -98,6 +110,10 @@ public class Cafeteria implements Parcelable {
 
     public Marker getMarker() { return this.marker; }
 
+    public double getPrice() { return price; }
+
+    public String getPriceString() {return priceString;}
+
     public void setDistanceToMe(int distanceToMe) {
         this.distanceToMe = distanceToMe;
     }
@@ -124,6 +140,8 @@ public class Cafeteria implements Parcelable {
         dest.writeParcelable(location, flags);
         dest.writeInt(distanceToMe);
         dest.writeString(openingHours);
+        dest.writeDouble(price);
+        dest.writeString(priceString);
     }
 }
 
