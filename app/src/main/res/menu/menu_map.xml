@@ -4,12 +4,8 @@
         android:onClick="getListView"
         android:title="@string/list_view">
     </item>
-    <item android:id="@+id/normalView"
-        android:onClick="getNormalView"
-        android:title="@string/normal_view">
-    </item>
-    <item android:id="@+id/satelliteView"
-        android:onClick="getSatelliteView"
+    <item android:id="@+id/view"
+        android:onClick="getView"
         android:title="@string/satellite_view">
     </item>
 </menu>

@@ -81,19 +81,25 @@ public class MainActivity extends AppCompatActivity {
         for (Cafeteria cafet : listCafet) {
             String[] cafetHoursLines = cafet.getOpeningHours().split("\n");
             String finalOpeningHours = "";
-            for (String line : cafetHoursLines) {
-                String[] cafetHoursStringList = line.split(" ");
+            for (int i = 0; i < cafetHoursLines.length; i++) {
+                String[] cafetHoursStringList = cafetHoursLines[i].split(" ");
                 cafetHoursStringList[0] = getString(Integer.parseInt(cafetHoursStringList[0]));
                 String newLine = "";
                 for (String string : cafetHoursStringList) {
                     newLine = newLine + string + " ";
                 }
-                finalOpeningHours += newLine;
-                if (cafetHoursLines.length > 1) {
-                    finalOpeningHours += "\n";
+                if (i == 1) {
+                    newLine = "\n" + newLine;
                 }
+                finalOpeningHours += newLine;
             }
             cafet.setOpeningHours(finalOpeningHours);
+
+            //Price unknown
+            if (cafet.getPrice() == -1) {
+                cafet.setPriceString(getString(R.string.not_available));
+            }
         }
+
     }
 }

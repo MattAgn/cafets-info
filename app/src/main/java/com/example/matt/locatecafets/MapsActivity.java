@@ -47,6 +47,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -108,10 +109,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(markerClickListener);
         mMap.setOnMapClickListener(mapClickListener);
         mMap.setOnMapLoadedCallback(mapLoadedCallback);
+        mMap.setOnMyLocationButtonClickListener(myLocationButtonListener);
 
         focusOnSelectedCafet();
         Location myLocation = getLocation();
         displayMarkers(myLocation);
+        //updatePositionAndClosestMarker(myLocation, true);
     }
 
     public void focusOnSelectedCafet() {
@@ -223,12 +226,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    public void updatePositionAndClosestMarker(Location loc) {
+    public void updatePositionAndClosestMarker(Location loc, boolean forcedUpdate) {
         if (loc != null) {
             Cafeteria previousClosestCafet = cafetList.get(0);
             updateOrderList(loc);
             Cafeteria newClosestCafet = cafetList.get(0);
-            if (previousClosestCafet != newClosestCafet) {
+            if (previousClosestCafet != newClosestCafet || forcedUpdate) {
+                // TODO: to change, easier for listActivity to pass down the id of the selected cafet
+                // TODO: and then to find it in the list
+                if (selectedCafet != null) {
+                    if (previousClosestCafet.getId() == selectedCafet.getId()) {
+                        previousClosestCafet.setMarker(selectedCafet.getMarker());
+                    }
+                    if (newClosestCafet.getId() == selectedCafet.getId()) {
+                        newClosestCafet.setMarker(selectedCafet.getMarker());
+                    }
+                }
                 Marker previousClosestMarker = previousClosestCafet.getMarker();
                 Marker newClosestMarker = newClosestCafet.getMarker();
                 previousClosestMarker.setTitle(previousClosestCafet.getName());
@@ -268,7 +281,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location loc) {
-            updatePositionAndClosestMarker(loc);
+            updatePositionAndClosestMarker(loc, false);
         }
 
         @Override
@@ -277,7 +290,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void onProviderEnabled(String provider) {
             Location myLocation = getLocation();
-            updatePositionAndClosestMarker(myLocation);
+            updatePositionAndClosestMarker(myLocation, false);
         }
 
         @Override
@@ -288,7 +301,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void run() {
                     showSettingsAlert((finalProvider.equals("gps")));                  }
-            }, 3000);
+            }, 1000);
         }
     };
 
@@ -304,7 +317,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         new LatLng(marker.getPosition().latitude + (double)90/Math.pow(2, zoom),
                                 marker.getPosition().longitude), zoom), 400, null);
                 InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
-                websiteCafetClicked = infoWindowData.getWebsite();
+                websiteCafetClicked = infoWindowData.getCafeteria().getWebsite();
                 selectedCafet = getCafetFromMarker(marker);
                 animateWebsiteButton();
             }
@@ -320,8 +333,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
             buttonSlideValue = width_px/2 - websiteButton.getWidth()/2;
-
+            Location myLocation = getLocation();
+            updatePositionAndClosestMarker(myLocation, true );
             displaySelectedCafet();
+        }
+    };
+
+    GoogleMap.OnMyLocationButtonClickListener myLocationButtonListener =  new GoogleMap.OnMyLocationButtonClickListener(){
+        @Override
+        public boolean onMyLocationButtonClick()
+        {
+            if (selectedCafet != null) {
+                selectedCafet.getMarker().hideInfoWindow();
+                hideWebsiteButton();
+            }
+            return false;
         }
     };
 
@@ -334,11 +360,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getMenuInflater().inflate(R.menu.menu_map, menu);
         return true;
     }
-    public void getNormalView(MenuItem item){
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-    }
-    public void getSatelliteView(MenuItem item){
-        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    public void getView(MenuItem item){
+        if (mMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            item.setTitle(R.string.normal_view);
+        } else {
+            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            item.setTitle(R.string.satellite_view);
+
+        }
+
     }
     public void getListView(MenuItem item) {
         Intent intent = new Intent(MapsActivity.this, ListActivity.class);

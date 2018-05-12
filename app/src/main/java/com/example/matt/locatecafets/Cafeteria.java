@@ -1,5 +1,6 @@
 package com.example.matt.locatecafets;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Parcel;
@@ -44,7 +45,7 @@ public class Cafeteria implements Parcelable {
         this.openingHours = openingHours;
         this.price = price;
         if (price == UNKNOWN_PRICE) {
-            this.priceString = "Not available";
+            this.priceString = "";
         }
         else {
             this.priceString = String.valueOf(price) + "€";
@@ -123,6 +124,8 @@ public class Cafeteria implements Parcelable {
     }
 
     public void setMarker(Marker marker) { this.marker = marker; }
+
+    public void setPriceString(String priceString) { this.priceString = priceString; }
 
     @Override
     public int describeContents() {

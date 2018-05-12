@@ -16,7 +16,7 @@
     <string name="image_description">image du restaurant</string>
     <string name="activate_gps">To fully use the app, don\'t forget to turn your GPS on</string>
     <string name="no_cafet">Pas de cafetérias trouvées à cette distance</string>
-    <string name="waiting_gps">En attende de la position GPS</string>
+    <string name="waiting_gps">En attende de la position GPS…</string>
     <string name="closest">(plus proche)</string>
     <string name="cancel">Annuler</string>
     <string name="continuee">Continuer</string>
@@ -27,5 +27,5 @@
     <string name="fri">Ven</string>
     <string name="not_available">Non disponible</string>
     <string name="logo">logo</string>
-    <string name="student_price">Student Price :</string>
+    <string name="student_price">Prix étudiant :</string>
 </resources>

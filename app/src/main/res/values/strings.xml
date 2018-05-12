@@ -16,7 +16,7 @@
     <string name="image_description">image of restaurant</string>
     <string name="activate_gps">To fully use the app, don\'t forget to turn your GPS on</string>
     <string name="no_cafet">No cafeteria found in this range</string>
-    <string name="waiting_gps">Waiting for GPS</string>
+    <string name="waiting_gps">Waiting for GPS…</string>
     <string name="closest">(closest)</string>
     <string name="cancel">Cancel</string>
     <string name="continuee">Continue</string>

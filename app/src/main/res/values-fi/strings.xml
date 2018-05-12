@@ -16,7 +16,7 @@
     <string name="image_description">kuva ravintolasta</string>
     <string name="activate_gps">To fully use the app, don\'t forget to turn your GPS on</string>
     <string name="no_cafet">Ei ole kahvilaa tällä alueella</string>
-    <string name="waiting_gps">Odotetaan GPS: tä</string>
+    <string name="waiting_gps">Odottaa GPS…</string>
     <string name="closest">(lähin)</string>
     <string name="cancel">Peruuttaa</string>
     <string name="continuee">Jatkaa</string>
@@ -24,7 +24,7 @@
     <string name="leaving_app">Olet poistumassa sovelluksesta</string>
     <string name="mon_thu">Ma-To</string>
     <string name="fri">Pe</string>
-    <string name="not_available">ei saatavilla</string>
+    <string name="not_available">Ei saatavilla</string>
     <string name="logo">logo</string>
-    <string name="student_price">Student Price :</string>
+    <string name="student_price">Opiskelijahinta :</string>
 </resources>

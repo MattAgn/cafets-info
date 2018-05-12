@@ -48,12 +48,14 @@ public class ListActivity extends Activity {
     private int maxDistance = 30000; //means default value is city size
     private List<Cafeteria> cafetList = Database.getCafeterias();
     private GoogleApiClient googleApiClient;
+    private ViewGroup wrapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        wrapper = findViewById(R.id.wrapper);
         Spinner displaySpinner = findViewById(R.id.spinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -83,7 +85,6 @@ public class ListActivity extends Activity {
     }
 
     public void updateInterface() {
-        ViewGroup wrapper = findViewById(R.id.wrapper);
         LinearLayout resultContainer = new LinearLayout(this);
         resultContainer.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -92,11 +93,7 @@ public class ListActivity extends Activity {
         params.setMargins(15, 0, 15, 10);
         resultContainer.setLayoutParams(params);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        int childCount = wrapper.getChildCount();
-        // Cleaning the interface
-        if (childCount != 0) {
-            wrapper.removeViewAt(0);
-        }
+        cleanInterface();
         // Showing the results
         for (int i = 0; i < cafetList.size(); i++) {
             final Cafeteria cafet = cafetList.get(i);
@@ -169,20 +166,24 @@ public class ListActivity extends Activity {
                     updateOrderList(myLocation);
                     updateInterface();
                 } else if (googleApiClient != null && shouldShowWaitingMessage){
-                    ViewGroup wrapper = findViewById(R.id.wrapper);
-                    int childCount = wrapper.getChildCount();
-                    // Cleaning the interface
-                    if (childCount != 0) {
-                        wrapper.removeViewAt(0);
-                    }
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), getString(R.string.waiting_gps), Toast.LENGTH_SHORT).show();                    }
-                    }, 700);
+                    cleanInterface();
+                    TextView textView = new TextView(this);
+                    textView.setText(R.string.waiting_gps);
+                    wrapper.addView(textView);
                 }
             }
+        }
+    }
+
+    /***************
+     ** INTERFACE **
+     **************/
+    public void cleanInterface() {
+        ViewGroup wrapper = findViewById(R.id.wrapper);
+        int childCount = wrapper.getChildCount();
+        // Cleaning the interface
+        if (childCount != 0) {
+            wrapper.removeViewAt(0);
         }
     }
 
@@ -206,7 +207,7 @@ public class ListActivity extends Activity {
                 public void run() {
                     showSettingsAlert((finalProvider.equals("gps")));
                 }
-            }, 1000);
+            }, 800);
         }
     };
 
