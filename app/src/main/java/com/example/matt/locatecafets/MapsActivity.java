@@ -117,12 +117,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //updatePositionAndClosestMarker(myLocation, true);
     }
 
+    public Bitmap resizeMapIcons(String iconName){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(
+                getResources(),getResources().getIdentifier(iconName, "drawable", getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, 120, 160, false);
+        return resizedBitmap;
+    }
+
     public void focusOnSelectedCafet() {
         if (getIntent().getExtras() != null) {
             // if the users wants to see only one the cafeterias
             selectedCafet = getIntent().getExtras().getParcelable("cafet");
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resizeMapIcons("marker_orange"));
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(selectedCafet.getCoordinates())
+                    .icon(icon)
                     //.icon(BitmapDescriptorFactory.fromBitmap(((BitmapDrawable)getDrawable(R.drawable.logo_final2)).getBitmap()))
                     .title(selectedCafet.getName());
             Marker m = mMap.addMarker(markerOptions);
@@ -188,12 +197,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         for (int i = 0; i < cafetList.size(); i++) {
             Cafeteria cafet = cafetList.get(i);
+
             if (i == 0 && myLocation !=null && (selectedCafet == null || selectedCafet.getId() != cafet.getId())) {
                 //closest cafet is not in the same color
+                BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resizeMapIcons("marker_red"));
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(cafet.getCoordinates())
                         .title(cafetList.get(i).getName() + " " + getString(R.string.closest))
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                        .icon(icon)
                         .snippet("Closest to you");
                 Marker m = mMap.addMarker(markerOptions);
                 InfoWindowData info = new InfoWindowData();
@@ -201,9 +212,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 m.setTag(info);
                 cafet.setMarker(m);
             } else if (selectedCafet == null || selectedCafet.getId() != cafet.getId()) {
+                BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resizeMapIcons("marker_orange"));
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(cafetList.get(i).getCoordinates())
-                        .title(cafetList.get(i).getName());
+                        .title(cafetList.get(i).getName())
+                        .icon(icon);
                 Marker m = mMap.addMarker(markerOptions);
                 InfoWindowData info = new InfoWindowData();
                 info.setCafeteria(cafet);
@@ -231,6 +244,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Cafeteria previousClosestCafet = cafetList.get(0);
             updateOrderList(loc);
             Cafeteria newClosestCafet = cafetList.get(0);
+            BitmapDescriptor iconClosest = BitmapDescriptorFactory.fromBitmap(resizeMapIcons("marker_red"));
+            BitmapDescriptor iconClassic = BitmapDescriptorFactory.fromBitmap(resizeMapIcons("marker_orange"));
             if (previousClosestCafet != newClosestCafet || forcedUpdate) {
                 // TODO: to change, easier for listActivity to pass down the id of the selected cafet
                 // TODO: and then to find it in the list
@@ -245,8 +260,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Marker previousClosestMarker = previousClosestCafet.getMarker();
                 Marker newClosestMarker = newClosestCafet.getMarker();
                 previousClosestMarker.setTitle(previousClosestCafet.getName());
-                previousClosestMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                newClosestMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                previousClosestMarker.setIcon(iconClassic);
+                newClosestMarker.setIcon(iconClosest);
                 newClosestMarker.setTitle(newClosestCafet.getName() + " " + getString(R.string.closest));
             }
             if (selectedCafet == null) {
